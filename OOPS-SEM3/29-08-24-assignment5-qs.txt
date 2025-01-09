@@ -1,0 +1,7 @@
+OOPS lab - 29th August 2024
+
+Questions :
+1- wap to find sum of n natural numbers by using friend class in c++
+2- wap to find the sum of the cube of numbers upto given integer range using friend function. also display the expression
+3- wap to demonstrate the use of friend function to add private data of two different class
+

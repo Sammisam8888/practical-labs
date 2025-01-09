@@ -1,0 +1,22 @@
+Lab class - 4 - 22/08/24
+
+Questions
+1. Define a class employee with the following specificaions :
+empno - int
+ename - string
+basic,hra,da - float
+netpay - float
+member functions :
+calculate () - a function to calculate basic+hra+da with float return type
+getdata()- a func to take input of empno, ename, basic, hra, da & involve calculate method to find netpay
+display() - function to display all data members
+
+2. Define a class car rental with following details :
+i - car_id - int 
+    car_type - string
+    rent - float
+    
+    Define a getchar() method to accept carid, cartype and return the rent of the car - for car type :
+    small car - 1000, van - 800, suv - 2500
+
+    Show_car()- method which allows users to view the contents of cars ie id,type and rent

@@ -1,0 +1,20 @@
+OOPS LAB - CSE1 - 3rd October 2024
+
+Q1 - A class editor has name, employee code & date of joining as its data member. A class reported is derived from it . this derived class has data members - field of operation, years of experience as its data members. wap to illustrate this inheritance
+
+Q2 - An employee class has name, employee code, salary as its data members. Income tax class has tax rate, tax deducted, and net salary as its data members. wap to derive the income tax class privately from its base class. Declare the member of the base under public section
+
+Q3 - A sales class has name of the salesman, the quantity of product sold and salary as data member. A class commission is derived from it has rate of commission, commission earned & total salary as data members. WAP to declare protected data in base class. Access the data of base class declared under protected section using member of derived class
+ 
+Q4 - A class student has roll no as its data member, then a class test is derived from it. this derived class has marks of two subjects as its data members. finally another class result is derived from the derived class. this derived class has sum of marks as its data member. wap to illustrate this inheritance
+
+Q5 - there are three different classes teacher, typist and officer respectively. 
+the first class has 2 data members - name of subject, publication record
+the typist class has speed of the typist as its data member
+the last class has grade of the officer, code number as its data member
+a class called as staff is derived from the above classes. wap to implement this concept
+
+Q6 - a class student has name as its data member, then 3 different classes - arts, medical and engineering are derived from it. this classes has university and college name as its data member. finally there are 3 different classes - cs, it and mca derived from engineering class. these classes have roll no as its data members
+
+(dont do)
+Q5 - WAP to create a class media. this class has title and price of publication as its data member. two classes book and tape are derived from it. the book class has no of pages as its data member and tape class has time of playing a tape as its data members. implement pure virtual function
