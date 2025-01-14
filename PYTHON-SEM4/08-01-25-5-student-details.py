@@ -10,7 +10,7 @@ cgpa=9.8
 university="University of jalandhar"
 print("There is a student whose name is ",name, " their roll number is ", rollno, "and their cgpa is ", cgpa, "and their university is :",university)
 
-print("datatypes : ")
+print("datatypes are : ")
 print("name=",type(name))
 print("rollno=",type(rollno))
 print("cgpa=",type(cgpa))
