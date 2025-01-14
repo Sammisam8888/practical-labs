@@ -1,0 +1,8 @@
+1. Print your name and roll number.
+2. Print the data type of a variable.
+3. Demonstrate type casting.
+4. Check the data type of user input.
+5. Ramcharan
+6. Calculate the average of two numbers.
+7. Perform arithmetic operations.
+8. Calculate the average marks of 5 students.

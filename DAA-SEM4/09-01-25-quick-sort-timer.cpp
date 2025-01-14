@@ -9,6 +9,7 @@ private :
 int n, *arr;
 void quicksort(int low, int high){
 int pivot=low;
+
 if (low>=high) return;
 int i = low + 1, j = high;
 while (i <= j) {
@@ -18,6 +19,7 @@ if (i < j) {
 swap(arr[i], arr[j]);
 }
 }
+
 swap(arr[pivot],arr[j]);
 quicksort(low,j-1);
 quicksort(j+1,high);
@@ -48,8 +50,8 @@ clock_t end = clock(); // End time
 cout<<"After Sorting : "<<endl;
 display();
 
-cout<<"Starting time = "<<double(start)/CLOCKS_PER_SEC<<endl;
-cout<<"Ending time = "<<double(end)/CLOCKS_PER_SEC<<endl;
+cout<<"Starting time = "<<double(start)/CLOCKS_PER_SEC<<"seconds"<<endl;
+cout<<"Ending time = "<<double(end)/CLOCKS_PER_SEC<<"seconds"<<endl;
 double time_taken = double(end - start) / CLOCKS_PER_SEC;
 cout << "Time taken for quicksort: " << time_taken << " seconds" << endl;
 
