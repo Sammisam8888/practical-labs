@@ -51,7 +51,12 @@ private:
 			cin >> arr[i];
 		}
 	}
-
+	void timedisplay(clock_t start, clock_t end){
+		cout << "Starting time = " << double(start) / CLOCKS_PER_SEC << " seconds" << endl;
+		cout << "Ending time = " << double(end) / CLOCKS_PER_SEC << " seconds" << endl;
+		double time_taken = double(end - start) / CLOCKS_PER_SEC;
+		cout << "Time taken for quicksort: " << time_taken << " seconds" << endl;
+	}
 public:
 	void operations()
 	{
@@ -66,12 +71,7 @@ public:
 
 		cout << "After Sorting : " << endl;
 		display();
-
-		cout << "Starting time = " << double(start) / CLOCKS_PER_SEC << " seconds" << endl;
-		cout << "Ending time = " << double(end) / CLOCKS_PER_SEC << " seconds" << endl;
-		double time_taken = double(end - start) / CLOCKS_PER_SEC;
-		cout << "Time taken for quicksort: " << time_taken << " seconds" << endl;
-
+		timedisplay(start,end);
 		delete[] arr;
 	}
 };
