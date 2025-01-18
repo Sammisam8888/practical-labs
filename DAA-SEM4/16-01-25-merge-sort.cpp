@@ -1,49 +1,66 @@
-// WAP to perform quick sort operation over an array and use the clock function to print the initial and final time taken for the entire quick sort operation
 #include <iostream>
 #include <ctime>
 #include <string>
+#include <climits>
 using namespace std;
 
 class Sort{
 private :
-int n,*arr,pivot,c=0;
+int n,*arr;
 double timediff[12];
-bool flag = 0;
 string type [4]= {"Sorted Ascending array","Sorted Descending Array","Unsorted array", "Sorted and Unsorted mixed array"};
-
-void quicksort(int low, int high)
-{
-    if (low >= high)
-    {
-        return;
-    }
-
-    if (flag)
-    {
-        pivot = low; // Assume the pivot as 'low' index for subsequent iterations
-    }
-
-    int i = low + 1, j = high;
-
-    while (i <= j)
-    {
-        while (i <= high && arr[i] <= arr[pivot])
-            i++;
-        while (j >= low && arr[j] > arr[pivot])
-            j--;
-        if (i < j)
-        {
-            swap(arr[i], arr[j]);
+    void mergesort(int low, int high) {
+        if (low >= high) {
+            return;
         }
+
+        int mid = low + (high - low) / 2;
+
+        // Recursive sorting of the left and right halves
+        mergesort(low, mid);
+        mergesort(mid + 1, high);
+
+        // Merge the sorted halves
+        merge(low, mid, high);
     }
 
-    flag = 1; 
+    void merge(int low, int mid, int high) {
+        int leftSize = mid - low + 1;
+        int rightSize = high - mid;
 
-    swap(arr[pivot], arr[j]);
-    quicksort(low, j - 1);   
-    quicksort(j + 1, high);  
-}
+        // Temporary arrays for left and right halves
+        int* left = new int[leftSize];
+        int* right = new int[rightSize];
 
+        for (int i = 0; i < leftSize; i++) {
+            left[i] = arr[low + i];
+        }
+        for (int i = 0; i < rightSize; i++) {
+            right[i] = arr[mid + 1 + i];
+        }
+
+        int i = 0, j = 0, k = low;
+
+        // Merge the arrays back into the main array
+        while (i < leftSize && j < rightSize) {
+            if (left[i] <= right[j]) {
+                arr[k++] = left[i++];
+            } else {
+                arr[k++] = right[j++];
+            }
+        }
+
+        // Copy remaining elements, if any
+        while (i < leftSize) {
+            arr[k++] = left[i++];
+        }
+        while (j < rightSize) {
+            arr[k++] = right[j++];
+        }
+
+        delete[] left;
+        delete[] right;
+    }
 void display()
 	{
 		cout << "The elements of the array are : " << endl;
@@ -63,17 +80,15 @@ void display()
 		{
 			cin >> arr[i];
 		}
-		cout<<"Enter the pivot element index : ";
-		cin>>pivot;
+
 	}
 	void calculatetime(clock_t start, clock_t end, int i){
 		timediff[i*3]=double(start) / CLOCKS_PER_SEC;
 		timediff[i*3+1]=double(end) / CLOCKS_PER_SEC;
 		timediff[i*3+2] = double(end - start) / CLOCKS_PER_SEC;		
 	}
-	
 	void displaytimediff() {
-    int slow = 0, fast = 0; 
+    int slow = 0, fast = 0; // Indices for slowest and fastest types
     cout << "The time differences between the 4 types of sorting are as follows:" << endl;
 
     for (int i = 0; i < 4; i++) {
@@ -112,7 +127,7 @@ public:
 
 		clock_t start = clock(); // Start time
 
-		quicksort(0, n - 1);
+		mergesort(0, n - 1);
 
 		clock_t end = clock(); // End time
 
