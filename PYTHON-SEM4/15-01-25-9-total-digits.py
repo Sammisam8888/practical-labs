@@ -1,4 +1,4 @@
-#wap to print titak digits in a number by taking user input
+#wap to print total digits in a number by taking user input
 
 n=int(input("Enter a number : "))
 count=0
