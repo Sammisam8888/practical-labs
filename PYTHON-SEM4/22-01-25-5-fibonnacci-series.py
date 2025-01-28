@@ -7,3 +7,4 @@ for i in range (50):
     d=first+second
     first=second
     second=d
+print()

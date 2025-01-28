@@ -20,8 +20,8 @@ else :
             lower+=1
 
     if characters==0 or numbers==0 or lower==0 or upper==0 or len(pwd)<8:
-        print("Password not valid. it contain at least one character, one number, one capital and one small number.Password should be at least 8 characters long.")
+        print("Password is not valid. it must contain at least one special character, one number, one capital and one small letter.Password should be at least 8 characters long.")
     else:
-        print("Password is strong.")
+        print("Password is strong and valid.")
 
     
