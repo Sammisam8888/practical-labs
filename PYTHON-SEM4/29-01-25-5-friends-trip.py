@@ -1,4 +1,4 @@
-friends=["Trupti","Arushi","Salman","Henry","Benjamin"]
+friends=["Sruti","Arushi","Salman","Henry","Benjamin"]
 
 friends.remove("Arushi")
 
