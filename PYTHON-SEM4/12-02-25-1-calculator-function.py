@@ -16,7 +16,7 @@ def calculator(a,b,op):
     elif op=='^':
         return f"The exponentiation of both the numbers is : {a**b}"
     else :
-        return "Invalid,  operationcannot be performed"
+        return "Invalid,  operation cannot be performed"
     
 
 a=float(input("Enter a number : "))
