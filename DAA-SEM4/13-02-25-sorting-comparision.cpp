@@ -4,7 +4,7 @@ using namespace std;
 
 class Sort
 {
-    int *arr, n,*temparr;
+    int *arr, n, *temparr;
     int arrsize[4] = {5, 10, 15, 20};
     double timediff[16];
     double mintime = 1e9, maxtime = 0;
@@ -122,28 +122,30 @@ class Sort
         a = b;
         b = temp;
     }
-    void copyarray(int *newarr, int *oldarr){
-        
+    void copyarray(int *newarr, int *oldarr)
+    {
+
         for (int k = 0; k < n; k++)
         {
             newarr[k] = oldarr[k];
         }
     }
+
 public:
     void runsort()
     {
         for (int i = 0; i < 4; i++)
-        {   
-            
+        {
+
             n = arrsize[i];
             getdata();
             temparr = new int[n];
-            copyarray(temparr,arr);
+            copyarray(temparr, arr);
             mintime = 1e9, maxtime = 0;
 
             for (int j = 0; j < 4; j++)
-            {                
-                int index = i*4+j;
+            {
+                int index = i * 4 + j;
                 double start = double(clock()) / CLOCKS_PER_SEC;
                 if (j == 0)
                 {
@@ -162,7 +164,7 @@ public:
                     heapsort();
                 }
                 double end = double(clock()) / CLOCKS_PER_SEC;
-                timediff[index] = end-start;
+                timediff[index] = end - start;
                 cout << "For " << sortingtype[j] << endl;
                 cout << "Start Time: " << start << " seconds" << endl;
                 cout << "End Time: " << end << " seconds" << endl;
@@ -177,7 +179,7 @@ public:
                     maxtime = timediff[index];
                     maxtype = sortingtype[j];
                 }
-                copyarray(arr,temparr);
+                copyarray(arr, temparr);
             }
             delete[] temparr;
             comparetime();
