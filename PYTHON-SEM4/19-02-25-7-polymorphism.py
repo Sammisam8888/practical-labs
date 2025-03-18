@@ -1,21 +1,21 @@
 class Department:
-    def __init__(self, name, num_faculties, num_students_above_9_cgpa):
+    def __init__(self, name, nofac, nosabove9):
         self.name = name
-        self.num_faculties = num_faculties
-        self.num_students_above_9_cgpa = num_students_above_9_cgpa
+        self.nofac = nofac
+        self.nosabove9 = nosabove9
 
-    def display_details(self):
+    def displaydetails(self):
         print(f"Department: {self.name}")
-        print(f"Number of Faculties: {self.num_faculties}")
-        print(f"Number of Students with CGPA above 9: {self.num_students_above_9_cgpa}")
+        print(f"Number of Faculties: {self.nofac}")
+        print(f"Number of Students with CGPA above 9: {self.nosabove9}")
 
 # Example of polymorphism
-def show_details(entity):
-    entity.display_details()
+def showdetails(entity):
+    entity.displaydetails()
 
 # Example usage
-cse_department = Department("CSE", 30, 50)
-ece_department = Department("ECE", 25, 40)
+csedepartment = Department("CSE", 30, 50)
+ecedepartment = Department("ECE", 25, 40)
 
-show_details(cse_department)
-show_details(ece_department)
+showdetails(csedepartment)
+showdetails(ecedepartment)

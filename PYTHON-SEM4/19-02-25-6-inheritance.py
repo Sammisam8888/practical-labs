@@ -1,12 +1,12 @@
 # i - inheritance about latest model of apple iphone
 class AppleIphone:
-    def __init__(self, model, release_year):
+    def __init__(self, model, releaseyear):
         self.model = model
-        self.release_year = release_year
+        self.releaseyear = releaseyear
 
 class LatestIphone(AppleIphone):
-    def __init__(self, model, release_year, features):
-        super().__init__(model, release_year)
+    def __init__(self, model, releaseyear, features):
+        super().__init__(model, releaseyear)
         self.features = features
 
 # ii - inheritance about multiple autonomous colleges under a university
@@ -15,9 +15,9 @@ class University:
         self.name = name
 
 class AutonomousCollege(University):
-    def __init__(self, name, college_name):
+    def __init__(self, name, collegename):
         super().__init__(name)
-        self.college_name = college_name
+        self.collegename = collegename
 
 # iii - multiple iits and nits under aicte
 class AICTE:
@@ -25,37 +25,43 @@ class AICTE:
         self.name = name
 
 class IIT(AICTE):
-    def __init__(self, name, iit_name):
+    def __init__(self, name, iitname):
         super().__init__(name)
-        self.iit_name = iit_name
+        self.iitname = iitname
 
 class NIT(AICTE):
-    def __init__(self, name, nit_name):
+    def __init__(self, name, nitname):
         super().__init__(name)
-        self.nit_name = nit_name
+        self.nitname = nitname
 
 # iv - inheritance about netflix membership
 class NetflixMembership:
-    def __init__(self, membership_type):
-        self.membership_type = membership_type
+    def __init__(self, membershiptype):
+        self.membershiptype = membershiptype
 
 class PremiumMembership(NetflixMembership):
-    def __init__(self, membership_type, user_watching):
-        super().__init__(membership_type)
-        self.user_watching = user_watching
+    def __init__(self, membershiptype, userwatching):
+        super().__init__(membershiptype)
+        self.userwatching = userwatching
 
-    def check_access(self, user_trying_to_login):
-        if self.user_watching:
+    def checkaccess(self, usertryingtologin):
+        if self.userwatching:
             print("Account is frozen for 24 hours due to multiple login attempts.")
         else:
             print("Access granted.")
 
 # Example usage
-latest_iphone = LatestIphone("iPhone 13", 2021, ["5G", "A15 Bionic"])
-print(f"Model: {latest_iphone.model}, Release Year: {latest_iphone.release_year}, Features: {latest_iphone.features}")
+latestiphone = LatestIphone("iPhone 13", 2021, ["5G", "A15 Bionic"])
+print(f"Model: {latestiphone.model}, Release Year: {latestiphone.releaseyear}, Features: {latestiphone.features}")
 
-college = AutonomousCollege("XYZ University", "ABC College")
-print(f"University: {college.name}, College: {college.college_name}")
+college = AutonomousCollege("BPUT", "TRIDENT INSTITUTE OF TECHNOLOGY")
+print(f"University: {college.name}, College: {college.collegename}")
+
+iit = IIT("AICTE", "IIT Bombay")
+print(f"AICTE: {iit.name}, IIT: {iit.iitname}")
+
+nit = NIT("AICTE", "NIT Trichy")
+print(f"AICTE: {nit.name}, NIT: {nit.nitname}")
 
 premium = PremiumMembership("Premium", True)
-premium.check_access("User2")
+premium.checkaccess("User2")
