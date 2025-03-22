@@ -1,13 +1,9 @@
 #include <iostream>
-#include <vector>
 #include <ctime>
 using namespace std;
 
 class Knapsack {
-    int n, capacity;
-    vector<int> weights, profits;
-    vector<vector<pair<int, int>>> sets;
-    vector<int> selected;
+    int n, capacity, **sets, *weights, *profits, *selected;
     clock_t start, end;
 
     void getdata() {
@@ -16,10 +12,17 @@ class Knapsack {
         cout << "Enter knapsack capacity: ";
         cin >> capacity;
 
-        weights.resize(n);
-        profits.resize(n);
-        selected.resize(n, 0);
-        sets.resize(n + 1);
+        weights = new int[n];
+        profits = new int[n];
+        selected = new int[n]();
+
+        sets = new int*[n + 1];
+        for (int i = 0; i <= n; i++) {
+            sets[i] = new int[2 * (1 << n)]; // Max possible unique weight-profit pairs
+            for (int j = 0; j < 2 * (1 << n); j++) {
+                sets[i][j] = -1; // Mark as empty
+            }
+        }
 
         cout << "Enter weights of items: ";
         for (int i = 0; i < n; i++) cin >> weights[i];
@@ -28,53 +31,69 @@ class Knapsack {
     }
 
     void union_sets(int index) {
-        sets[index] = sets[index - 1];
+        int size = 0;
+        for (int i = 0; sets[index - 1][i] != -1; i += 2) {
+            sets[index][size] = sets[index - 1][i];      
+            sets[index][size + 1] = sets[index - 1][i + 1];
+            size += 2;
+        }
 
-        for (auto &[w, p] : sets[index - 1]) {
-            int newWeight = w + weights[index - 1];
-            int newProfit = p + profits[index - 1];
+        for (int i = 0; sets[index - 1][i] != -1; i += 2) {
+            int newWeight = sets[index - 1][i] + weights[index - 1];
+            int newProfit = sets[index - 1][i + 1] + profits[index - 1];
 
-            if (newWeight <= capacity)
-                sets[index].push_back({newWeight, newProfit});
+            if (newWeight <= capacity) {
+                sets[index][size] = newWeight;
+                sets[index][size + 1] = newProfit;
+                size += 2;
+            }
         }
     }
 
     void remove_invalid_pairs(int index) {
-        vector<pair<int, int>> temp;
-        for (auto &[w1, p1] : sets[index]) {
+        int size = 0, temp[2 * (1 << n)];
+        for (int i = 0; sets[index][i] != -1; i += 2) {
             bool keep = true;
-            for (auto &[w2, p2] : sets[index]) {
-                if (w1 > w2 && p1 <= p2) {
+            for (int j = 0; sets[index][j] != -1; j += 2) {
+                if (i != j && sets[index][j] <= sets[index][i] && sets[index][j + 1] >= sets[index][i + 1]) {
                     keep = false;
                     break;
                 }
             }
-            if (keep) temp.push_back({w1, p1});
+            if (keep) {
+                temp[size] = sets[index][i];
+                temp[size + 1] = sets[index][i + 1];
+                size += 2;
+            }
         }
-        sets[index] = temp;
+
+        for (int i = 0; i < size; i++) {
+            sets[index][i] = temp[i];
+        }
+        sets[index][size] = -1; 
     }
 
     void find_max_profit() {
         int maxProfit = 0, bestIndex = -1;
-        for (int i = 0; i < sets[n].size(); i++) {
-            if (sets[n][i].second > maxProfit) {
-                maxProfit = sets[n][i].second;
+        for (int i = 0; sets[n][i] != -1; i += 2) {
+            if (sets[n][i + 1] > maxProfit) {
+                maxProfit = sets[n][i + 1];
                 bestIndex = i;
             }
         }
 
-        int remWeight = sets[n][bestIndex].first;
+        int remWeight = sets[n][bestIndex], remProfit = maxProfit;
         for (int i = n - 1; i >= 0; i--) {
-            if (remWeight >= weights[i] && maxProfit - profits[i] >= 0) {
+            if (remWeight >= weights[i] && remProfit >= profits[i]) {
                 selected[i] = 1;
                 remWeight -= weights[i];
-                maxProfit -= profits[i];
+                remProfit -= profits[i];
             }
         }
 
-        cout << "Maximum Profit: " << sets[n][bestIndex].second << endl;
+        cout << "Maximum Profit: " << maxProfit << endl;
         cout << "Selected Items: ";
-        for (int x : selected) cout << x << " ";
+        for (int i = 0; i < n; i++) cout << selected[i] << " ";
         cout << endl;
     }
 
@@ -86,7 +105,9 @@ public:
     void operations() {
         getdata();
         start = clock();
-        sets[0].push_back({0, 0});
+        sets[0][0] = 0;
+        sets[0][1] = 0;
+        sets[0][2] = -1;
 
         for (int i = 1; i <= n; i++) {
             union_sets(i);
@@ -96,6 +117,14 @@ public:
         find_max_profit();
         end = clock();
         displaytime();
+
+        delete[] weights;
+        delete[] profits;
+        delete[] selected;
+        for (int i = 0; i <= n; i++) {
+            delete[] sets[i];
+        }
+        delete[] sets;
     }
 };
 
