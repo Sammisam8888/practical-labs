@@ -69,7 +69,6 @@ private:
     }
 
     void getdata() {
-        cout << "Enter values for the array" << endl;
         cout << "Enter the size of the array: ";
         cin >> n;
         arr = new int[n];
@@ -81,7 +80,11 @@ private:
         for (int i = 0; i < n; i++) cout << arr[i] << " ";
         cout << endl;
     }
-
+    void displaytime(clock_t start,clock_t end, string x){
+        cout << "Start time: " << double(start) / CLOCKS_PER_SEC << " seconds" << endl;
+        cout << "End time: " << double(end) / CLOCKS_PER_SEC << " seconds" << endl;
+        cout << "Time taken to"<< x <<":"<< double(end - start) / CLOCKS_PER_SEC << " seconds" << endl;
+    }
 public:
     void operations() {
         getdata();
@@ -91,9 +94,7 @@ public:
         start = clock();
         build_max_heap();
         end = clock();
-        cout << "Start time: " << double(start) / CLOCKS_PER_SEC << " seconds" << endl;
-        cout << "End time: " << double(end) / CLOCKS_PER_SEC << " seconds" << endl;
-        cout << "Time taken to build max heap: " << double(end - start) / CLOCKS_PER_SEC << " seconds" << endl;
+        displaytime(start,end,"build max heap");
         cout << "After building max heap: " << endl;
         display();
 
@@ -103,9 +104,8 @@ public:
         start = clock();
         insert_key(key);
         end = clock();
-        cout << "Start time: " << double(start) / CLOCKS_PER_SEC << " seconds" << endl;
-        cout << "End time: " << double(end) / CLOCKS_PER_SEC << " seconds" << endl;
-        cout << "Time taken to insert key: " << double(end - start) / CLOCKS_PER_SEC << " seconds" << endl;
+        displaytime(start,end,"insert key");
+        
         cout << "After inserting key: " << endl;
         display();
 
@@ -116,9 +116,8 @@ public:
         int extractedKey = extract_key(index);
         end = clock();
         cout << "Extracted key: " << extractedKey << endl;
-        cout << "Start time: " << double(start) / CLOCKS_PER_SEC << " seconds" << endl;
-        cout << "End time: " << double(end) / CLOCKS_PER_SEC << " seconds" << endl;
-        cout << "Time taken to extract key: " << double(end - start) / CLOCKS_PER_SEC << " seconds" << endl;
+        displaytime(start,end,"extract key");
+       
         cout << "After extracting key: " << endl;
         display();
 
