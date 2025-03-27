@@ -16,7 +16,7 @@ public:
         p = new int[n];
         dp = new int*[n + 1];
         for (int i = 0; i <= n; i++) {
-            dp[i] = new int[W + 1]{0};  // Initialize with 0
+            dp[i] = new int[W + 1]{0};  
         }
 
         cout << "Enter weights of the items: ";
@@ -44,13 +44,13 @@ public:
         cout << "Knapsack DP Table:\n";
         for (int i = 0; i <= n; i++) {
             for (int j = 0; j <= W; j++)
-                cout << dp[i][j] << "\t";
+                cout << dp[i][j] << "  ";
             cout << endl;
         }
     }
 
     void findItems() {
-        cout << "Selected items (1-based index): ";
+        cout << "Selected items : ";
         int j = W;
         for (int i = n; i > 0; i--) {
             if (dp[i][j] != dp[i - 1][j]) {
