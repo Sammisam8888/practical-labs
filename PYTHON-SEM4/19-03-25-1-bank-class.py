@@ -20,7 +20,5 @@ acc2 = Bank("654321", 2000)
 acc1.deposit(500)
 print(f"Account {acc1.accno} balance after deposit: {acc1.accbal}")
 
-if acc2.withdraw(1500):
-    print(f"Account {acc2.accno} balance after withdrawal: {acc2.accbal}")
-else:
-    print(f"Account {acc2.accno} withdrawal failed. Current balance: {acc2.accbal}")
+acc2.withdraw(3000)
+print(f"Account {acc2.accno} balance : {acc2.accbal}")
