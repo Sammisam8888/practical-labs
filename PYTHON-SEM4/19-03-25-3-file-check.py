@@ -1,6 +1,6 @@
 import os
 
-def check_and_replace_file(fname):
+def replace(fname):
     if os.path.exists(fname):
         os.remove(fname)
         print(f"{fname} removed.")
@@ -11,4 +11,4 @@ def check_and_replace_file(fname):
         print(f"{fname} created.")
 
 fname = input("Enter the file name: ")
-check_and_replace_file(fname)
+replace(fname)
