@@ -48,28 +48,29 @@ class LCS{
             }
             else continue;
         }
+        cout<<'\n';
     }
     void display(){
-        cout<<"Longest common subsequence DP table : \n";
-        for (int i=-1;i<=n;i++){
+        cout << "Longest common subsequence DP table:\n";
+        cout << "        "; // Space for alignment of the top row
+        for (int j = 1; j <= n; j++) {
             
-            for (int j=-1;j<=m;j++){
-                if (i==-1 && j==-1){
-                    cout<<"X| Y ";
-                    continue;
-                }
-                else if(i==-1){
-                    cout<<y[j]<<"   ";
-                    continue;
-                }
-                else if (j==-1){
-                    cout<<x[i]<<"   ";
-                }
-                else {
-                    cout<<c[i][j]<<b[i][j]<<"  ";
-                }
+                cout << y[j-1] << "   "; // Print the second sequence characters
+           
+        }
+        cout << '\n';
+
+        for (int i = 0; i <= m; i++) {
+            if (i > 0) {
+                cout << x[i - 1] << "   "; // Print the first sequence characters
+            } else {
+                cout << "    "; // Space for alignment of the first row
             }
-            cout<<'\n';
+
+            for (int j = 0; j <= n; j++) {
+                cout << c[i][j] << b[i][j] << "  "; // Print DP table values and directions
+            }
+            cout << '\n';
         }
     }
 
@@ -101,7 +102,7 @@ public :
     }
     void operations(){
         lcslength();
-        // display();
+        display();
         debugdisplay();
     }
     ~LCS() {
