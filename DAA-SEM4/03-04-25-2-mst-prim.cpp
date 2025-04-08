@@ -1,0 +1,4 @@
+class MST{
+int *prim(){
+    
+}
