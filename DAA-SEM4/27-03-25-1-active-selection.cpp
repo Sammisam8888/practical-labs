@@ -75,6 +75,7 @@ public:
         delete[] s;
         delete[] f;
         delete[] selectedjobs;
+        delete[] counter;
     }
 };
 
