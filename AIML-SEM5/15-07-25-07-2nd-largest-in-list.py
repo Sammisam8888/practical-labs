@@ -8,4 +8,3 @@ for i in l:
 	elif i>mx2:
 		mx2=i
 print(f"The second largest element in the list is : {mx2}")
-print(type(l[0]))
