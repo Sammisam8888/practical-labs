@@ -3,3 +3,5 @@
 *.vssut.workspace
 .env
 *.pdsbak
+__pycache__
+*.pyc
