@@ -1,7 +1,8 @@
 #include <iostream>
-#include <limits.h>
 #include <ctime>
 using namespace std;
+
+const int INF = 1e9;
 
 class Matrix
 {
@@ -36,7 +37,7 @@ private:
             for (int i = 1; i <= n - l + 1; i++)
             {
                 int j = i + l - 1;
-                m[i][j] = INT_MAX;
+                m[i][j] = INF;
     
                 for (int k = i; k < j; k++)
                 {
