@@ -26,4 +26,3 @@ int main(){
 	printf("In the given string %s\nThe no of alphabets are : %d, No of Vowels are : %d, No of Consonants are : %d",s,alphabet,vowel,consonant);
 	printf("\nThe no of Digits are : %d\nThe number of Special characters are : %d",digit,sp);
 }
-//if (i=='=' && i=='!' || i=='@' || i=='#' || i=='$' || i=='%' || i=='&'|| i=='*' || i=='('||i==')'|| i=='-'||i=='_')
