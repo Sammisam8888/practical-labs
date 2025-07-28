@@ -7,7 +7,6 @@ int main(){
 	scanf("%s",s);
 	printf("Enter a substring : ");
 	scanf("%s",subs);
-	
 	int substring = 0;
 	char *i=s;
 	while (*i != '\0'){
@@ -24,7 +23,6 @@ int main(){
 		i++; 
 		
 	}
-
 	printf("The number of times %s repeats in %s is : %d",subs,s,substring);
 	return 0;
 }
