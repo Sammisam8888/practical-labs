@@ -35,6 +35,6 @@ int main(){
 		}
 		i++;
 	}
-	printf("The given binary number %s %s end with 01",s,(q0(s,0)?"does":"doesn't"));
+	printf("The given binary number %s %s end with 01\n",s,(q0(s,0)?"does":"doesn't"));
 	return 0;
 }

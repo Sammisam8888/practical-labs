@@ -37,7 +37,7 @@ int main(){
 	printf("Enter the power of b (b^m) (m>=1) : ");
 	scanf("%d",&m);
 	
-	printf("The given conditions of : n mod 2=0 & m>=1 over a^%d*b^%d is %s",n,m,(q0(n,m)?"satisfied":"not satisfied"));
+	printf("The given conditions of : n mod 2=0 & m>=1 over a^%d*b^%d is %s\n",n,m,(q0(n,m)?"satisfied":"not satisfied"));
 	
 	
 	return 0;
