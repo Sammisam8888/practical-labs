@@ -2,8 +2,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-bool q1(char s[],int i);
-
 bool q0(char s[],int i){
 	if (s[i]=='\0') return 0; //reject state 
 	else if (s[i]=='1') return 0; //reject state 
