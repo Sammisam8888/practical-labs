@@ -1,110 +1,122 @@
-import turtle
 from collections import deque
-import time
+import matplotlib.pyplot as plt
+import networkx as nx
 
-def get_children(x, y, jug1, jug2):
-    children = []
-    children.append((jug1, y))     # Fill Jug 1
-    children.append((x, jug2))     # Fill Jug 2
-    children.append((0, y))        # Empty Jug 1
-    children.append((x, 0))        # Empty Jug 2
-    pour = min(x, jug2 - y)
-    children.append((x - pour, y + pour))  # Jug1 → Jug2
-    pour = min(y, jug1 - x)
-    children.append((x + pour, y - pour))  # Jug2 → Jug1
-    return children
+class waterjug:
+    def __init__(self, jug1, jug2, target):
+        self.jug1 = jug1
+        self.jug2 = jug2
+        self.target = target
+        self.visited = set()
+        self.parent = {}
 
-def bfswaterjug(jug1, jug2, target):
-    visited = set()
-    queue = deque()
-    parent = dict()
+    def check(self, x, y):
+        return 0 <= x <= self.jug1 and 0 <= y <= self.jug2
 
-    start = (0, 0)
-    queue.append(start)
-    visited.add(start)
-    found = None
+    def getchildren(self, x, y):
+        states = []
 
-    while queue:
-        current = queue.popleft()
-        if target in current:
-            found = current
-            break
-        for child in get_children(current[0], current[1], jug1, jug2):
-            if child not in visited:
-                visited.add(child)
-                queue.append(child)
-                parent[child] = current
+        # Fill Jug1
+        states.append((self.jug1, y))
+        # Fill Jug2
+        states.append((x, self.jug2))
+        # Empty Jug1
+        states.append((0, y))
+        # Empty Jug2
+        states.append((x, 0))
+        # Pour Jug1 -> Jug2
+        pour = min(x, self.jug2 - y)
+        states.append((x - pour, y + pour))
+        # Pour Jug2 -> Jug1
+        pour = min(y, self.jug1 - x)
+        states.append((x + pour, y - pour))
 
-    if not found:
-        print("No solution found.")
-        return
+        return [state for state in states if self.check(*state)]
 
-    # Build path
-    path = []
-    while found != (0, 0):
-        path.append(found)
-        found = parent[found]
-    path.append((0, 0))
-    path.reverse()
+    def bfs(self):
+        q = deque()
+        q.append((0, 0))
+        self.visited.add((0, 0))
+        traversal = []
 
-    print("\nBFS path traversal:", end=" ")
-    for i in range(len(path)):
-        if i == len(path) - 1:
-            print(path[i], end=" *\n")
-        else:
-            print(path[i], end=" -> ")
+        while q:
+            curr = q.popleft()
+            traversal.append(curr)
 
-    draw_tree(path)
+            if self.target in curr:
+                return traversal  # Only return traversal
 
-def draw_tree(path):
-    t = turtle.Turtle()
-    screen = turtle.Screen()
-    t.speed(0)
-    t.penup()
-    t.goto(0, 0)
-    t.pendown()
+            for next_state in self.getchildren(*curr):
+                if next_state not in self.visited:
+                    self.visited.add(next_state)
+                    self.parent[next_state] = curr
+                    q.append(next_state)
 
-    radius = 35
-    step_x = 100
-    step_y = 100
+        return traversal
 
-    node_positions = {}
-    x = 0
-    y = 0
+class display:
+    def __init__(self, traversal, parent):
+        self.G = nx.DiGraph()
+        self.traversal = traversal
+        self.parent = parent
+        self.positions = {}
+        self.drawgraph()
 
-    for i, node in enumerate(path):
-        pos = (x, y)
-        node_positions[node] = pos
+    def drawgraph(self):
+        level_map = {}  # node -> level
+        level_nodes = {}  # level -> list of nodes
 
-        t.penup()
-        t.goto(x, y)
-        t.pendown()
+        # Assign levels to each node
+        for node in self.traversal:
+            if node == (0, 0):
+                level_map[node] = 0
+                level_nodes[0] = [node]
+            else:
+                parent = self.parent.get(node)
+                if parent:
+                    level = level_map[parent] + 1
+                    level_map[node] = level
+                    if level not in level_nodes:
+                        level_nodes[level] = []
+                    level_nodes[level].append(node)
 
-        # Draw circle
-        t.fillcolor("lightblue")
-        t.begin_fill()
-        t.circle(radius)
-        t.end_fill()
+        self.G.clear()
+        self.positions.clear()
 
-        # Write state
-        t.penup()
-        t.goto(x, y + radius + 5)
-        t.write(str(node), align="center", font=("Arial", 10, "bold"))
+        y_gap = 2  # vertical gap between levels
+        x_gap = 2  # horizontal gap between nodes
 
-        # Draw edge to next node
-        if i < len(path) - 1:
-            x_next, y_next = x + step_x, y - step_y
-            t.goto(x, y - radius)
-            t.pendown()
-            t.goto(x_next, y_next + radius)
-            x, y = x_next, y_next
+        for level in sorted(level_nodes.keys()):
+            nodes = level_nodes[level]
+            start_x = - (len(nodes) - 1) * x_gap / 2  # center the level horizontally
+            for i, node in enumerate(nodes):
+                x = start_x + i * x_gap
+                y = -level * y_gap
+                self.positions[node] = (x, y)
+                self.G.add_node(node)
 
-    t.hideturtle()
-    screen.title("Water Jug BFS Tree")
-    screen.mainloop()
+        # Add edges from parent to children
+        for node in self.traversal:
+            parent = self.parent.get(node)
+            if parent and parent in self.traversal:
+                self.G.add_edge(parent, node)
+
+        plt.figure(figsize=(14, 8))
+        nx.draw(self.G, pos=self.positions, with_labels=True,
+                node_color='lightblue', node_size=2000,
+                font_size=10, font_weight='bold', arrows=True)
+        plt.title("BFS Traversal Tree of Water Jug Problem")
+        plt.show()
 
 if __name__ == "__main__":
-    jug1 = int(input("Enter capacity of Jug 1: "))
-    jug2 = int(input("Enter capacity of Jug 2: "))
-    target = int(input("Enter the target amount: "))
-    bfswaterjug(jug1, jug2, target)
+    a = int(input("Enter capacity of Jug 1: "))
+    b = int(input("Enter capacity of Jug 2: "))
+    c = int(input("Enter the target amount: "))
+
+    solver = waterjug(a, b, c)
+    traversal = solver.bfs()
+
+    print("\nBFS traversal path:")
+    print(" -> ".join(str(state) for state in traversal))
+
+    display(traversal, solver.parent)

@@ -1,104 +1,110 @@
-import turtle
 from collections import deque
+import matplotlib.pyplot as plt
+import networkx as nx
 
-def get_children(x, y, jug1, jug2):
-    children = []
-    children.append((jug1, y))     # Fill Jug 1
-    children.append((x, jug2))     # Fill Jug 2
-    children.append((0, y))        # Empty Jug 1
-    children.append((x, 0))        # Empty Jug 2
-    pour = min(x, jug2 - y)
-    children.append((x - pour, y + pour))  # Jug1 → Jug2
-    pour = min(y, jug1 - x)
-    children.append((x + pour, y - pour))  # Jug2 → Jug1
-    return children
+class waterjug:
+    def __init__(self, jug1, jug2, target):
+        self.jug1 = jug1
+        self.jug2 = jug2
+        self.target = target
+        self.visited = set()
+        self.parent = {}
 
-def dfswaterjug(jug1, jug2, target):
-    visited = set()
-    stack = []
-    parent = dict()
+    def check(self, x, y):
+        return 0 <= x <= self.jug1 and 0 <= y <= self.jug2
 
-    start = (0, 0)
-    stack.append(start)
-    visited.add(start)
-    found = None
+    def getchildren(self, x, y):
+        states = []
 
-    while stack:
-        current = stack.pop()
-        if target in current:
-            found = current
-            break
-        for child in get_children(current[0], current[1], jug1, jug2):
-            if child not in visited:
-                visited.add(child)
-                stack.append(child)
-                parent[child] = current
+        states.append((self.jug1, y))  # Fill Jug1
+        states.append((x, self.jug2))  # Fill Jug2
+        states.append((0, y))          # Empty Jug1
+        states.append((x, 0))          # Empty Jug2
 
-    if not found:
-        print("No solution found.")
-        return
+        pour = min(x, self.jug2 - y)   # Pour Jug1 -> Jug2
+        states.append((x - pour, y + pour))
 
-    # Build path
-    path = []
-    while found != (0, 0):
-        path.append(found)
-        found = parent[found]
-    path.append((0, 0))
-    path.reverse()
+        pour = min(y, self.jug1 - x)   # Pour Jug2 -> Jug1
+        states.append((x + pour, y - pour))
 
-    print("\nDFS path traversal:", end=" ")
-    for i in range(len(path)):
-        if i == len(path) - 1:
-            print(path[i], end=" *\n")
-        else:
-            print(path[i], end=" -> ")
+        return [state for state in states if self.check(*state)]
 
-    draw_tree(path)
+    def dfs(self):
+        stack = []
+        stack.append((0, 0))
+        self.visited.add((0, 0))
+        traversal = []
 
-def draw_tree(path):
-    t = turtle.Turtle()
-    screen = turtle.Screen()
-    t.speed(0)
-    t.penup()
-    t.goto(0, 0)
-    t.pendown()
+        found = None
+        while stack:
+            curr = stack.pop()
+            traversal.append(curr)
 
-    radius = 35
-    step_x = 100
-    step_y = 100
+            if self.target in curr:
+                found = curr
+                break
 
-    x, y = 0, 0
+            for next_state in self.getchildren(*curr):
+                if next_state not in self.visited:
+                    self.visited.add(next_state)
+                    self.parent[next_state] = curr
+                    stack.append(next_state)
 
-    for i, node in enumerate(path):
-        t.penup()
-        t.goto(x, y)
-        t.pendown()
+        return traversal
 
-        # Draw circle
-        t.fillcolor("lightgreen")
-        t.begin_fill()
-        t.circle(radius)
-        t.end_fill()
+class display:
+    def __init__(self, traversal, parent):
+        self.G = nx.DiGraph()
+        self.traversal = traversal
+        self.parent = parent
+        self.positions = {}
+        self.drawgraph()
 
-        # Write state
-        t.penup()
-        t.goto(x, y + radius + 5)
-        t.write(str(node), align="center", font=("Arial", 10, "bold"))
+    def drawgraph(self):
+        self.G.clear()
+        self.positions.clear()
 
-        # Draw edge to next node
-        if i < len(path) - 1:
-            x_next, y_next = x + step_x, y - step_y
-            t.goto(x, y - radius)
-            t.pendown()
-            t.goto(x_next, y_next + radius)
-            x, y = x_next, y_next
+        x_gap = 2
+        y_gap = 2
+        x_pos_counter = [0]  # mutable to track current x position
+        visited = set()
 
-    t.hideturtle()
-    screen.title("Water Jug DFS Tree")
-    screen.mainloop()
+        def dfspos(node, depth):
+            if node in visited:
+                return
+            visited.add(node)
+
+            x = x_pos_counter[0]
+            y = -depth * y_gap
+            self.positions[node] = (x, y)
+            self.G.add_node(node)
+
+            x_pos_counter[0] += x_gap
+
+            for child in self.traversal:
+                if self.parent.get(child) == node:
+                    self.G.add_edge(node, child)
+                    dfspos(child, depth + 1)
+
+        root = (0, 0)
+        dfspos(root, 0)
+
+        plt.figure(figsize=(14, 8))
+        nx.draw(self.G, pos=self.positions, with_labels=True,
+                node_color='lightgreen', node_size=2000,
+                font_size=10, font_weight='bold', arrows=True)
+        plt.title("DFS Traversal Tree of Water Jug Problem")
+        plt.show()
 
 if __name__ == "__main__":
-    jug1 = int(input("Enter capacity of Jug 1: "))
-    jug2 = int(input("Enter capacity of Jug 2: "))
-    target = int(input("Enter the target amount: "))
-    dfswaterjug(jug1, jug2, target)
+    a = int(input("Enter capacity of Jug 1: "))
+    b = int(input("Enter capacity of Jug 2: "))
+    c = int(input("Enter the target amount: "))
+
+    solver = waterjug(a, b, c)
+    traversal = solver.dfs()
+
+    print("\nDFS traversal path:")
+    print(" -> ".join(str(state) for state in traversal))
+
+    display(traversal, solver.parent)
