@@ -1,4 +1,3 @@
-from collections import deque
 import matplotlib.pyplot as plt
 import networkx as nx
 
@@ -69,35 +68,35 @@ class display:
         self.drawgraph()
 
     def drawgraph(self):
-        level_map = {}  # node -> level
-        level_nodes = {}  # level -> list of nodes
+        levelmap = {}  # node -> level
+        levelnodes = {}  # level -> list of nodes
 
         # Assign levels to each node
         for node in self.traversal:
             if node == (0, 0):
-                level_map[node] = 0
-                level_nodes[0] = [node]
+                levelmap[node] = 0
+                levelnodes[0] = [node]
             else:
                 parent = self.parent.get(node)
                 if parent:
-                    level = level_map[parent] + 1
-                    level_map[node] = level
-                    if level not in level_nodes:
-                        level_nodes[level] = []
-                    level_nodes[level].append(node)
+                    level = levelmap[parent] + 1
+                    levelmap[node] = level
+                    if level not in levelnodes:
+                        levelnodes[level] = []
+                    levelnodes[level].append(node)
 
         self.G.clear()
         self.positions.clear()
 
-        y_gap = 2  # vertical gap between levels
-        x_gap = 2  # horizontal gap between nodes
+        ygap = 2  # vertical gap between levels
+        xgap = 2  # horizontal gap between nodes
 
-        for level in sorted(level_nodes.keys()):
-            nodes = level_nodes[level]
-            start_x = - (len(nodes) - 1) * x_gap / 2  # center the level horizontally
+        for level in sorted(levelnodes.keys()):
+            nodes = levelnodes[level]
+            startx = - (len(nodes) - 1) * xgap / 2  # center the level horizontally
             for i, node in enumerate(nodes):
-                x = start_x + i * x_gap
-                y = -level * y_gap
+                x = startx + i * xgap
+                y = -level * ygap
                 self.positions[node] = (x, y)
                 self.G.add_node(node)
 

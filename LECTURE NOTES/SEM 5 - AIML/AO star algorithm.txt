@@ -1,0 +1,53 @@
+Procedure  AO*
+Begin
+
+1. Given the goal node INIT in the graph G; evaluate h’ at INIT;
+2. Repeat
+   (a) Trace the marked arcs from the node INIT, if any such exists, and
+       select one of the unexpanded nodes, named NODE, that occurs on this
+       path, for expansion.
+
+   (b) If NODE cannot be expanded, Then assign FUTILITY as the h’
+       value of NODE, indicating that NODE is not solvable;
+
+       Else for each such successor, called SUCCESSOR, which is not an
+       ancestor of NODE, do
+       Begin
+          (i)   Append SUCCESSOR to the graph G.
+
+          (ii)  If SUCCESSOR is a terminal node Then label it
+                SOLVED and set its h’ value 0.
+
+          (iii) If SUCCESSOR is not a terminal node Then estimate its
+                h’ value;
+       End;
+
+   (c) Initialize S to NODE;
+
+   (d) Repeat
+       (i)   Select from S a node, none of whose descendants belong to
+             S. Call it CURRENT and remove it from S.
+
+       (ii)  Estimate the cost of each of the arcs, emerging from
+             CURRENT. The cost of each arc is equal to the sum of h’
+             value of each of the nodes at the end of the arc plus the cost
+             of the arc itself. The new h’ value of CURRENT is the
+             minimum of the cost just computed for the arcs emerging
+             from it.
+
+       (iii) Label the best path out of CURRENT by marking the arc that
+             had the least cost as computed in the last step.
+
+       (iv)  If all of the nodes connected to CURRENT through the new
+             marked arcs have been labeled SOLVED, Then mark the
+             CURRENT SOLVED.
+
+       (v)   If CURRENT is marked SOLVED or the cost of CURRENT
+             was changed, Then propagate its new status back up the tree,
+             add all the ancestors of CURRENT to S.
+
+   Until S is empty.
+
+Until INIT is labeled solved or its h’ value becomes greater than a maximum
+level called FUTILITY:
+End.
