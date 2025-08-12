@@ -9,109 +9,135 @@ class waterjug:
         self.visited = set()
         self.parent = {}
         
-
     def check(self, x, y):
         return 0 <= x <= self.jug1 and 0 <= y <= self.jug2
 
     def getchildren(self, x, y):
         states = []
-
-        # Fill Jug1
         states.append((self.jug1, y))
-        # Fill Jug2
         states.append((x, self.jug2))
-        # Empty Jug1
         states.append((0, y))
-        # Empty Jug2
         states.append((x, 0))
-        # Pour Jug1 -> Jug2
         pour = min(x, self.jug2 - y)
         states.append((x - pour, y + pour))
-        # Pour Jug2 -> Jug1
         pour = min(y, self.jug1 - x)
         states.append((x + pour, y - pour))
-
         return [state for state in states if self.check(*state)]
 
     def fvalue(self, state):
         x, y = state
-        return abs(x - self.target) + abs(y - 0) #f value of the state (target,0)
+        return abs(x - self.target) + abs(y - 0) 
 
     def hillclimb(self):
         stack=[]
         traversal=[]
+        traversalf=[]
+        rejected=[(0,0)]
+        rejectedf=[self.fvalue((0,0))]
         stack.append((0,0))
-        while (stack):
+        while stack:
             top=stack.pop()
             traversal.append(top)
+            traversalf.append(self.fvalue(top))
             self.visited.add(top)
             if (top[0]==self.target and top[1]==0) or (top[1]==self.target and top[0]==0):
-                # traversal.append(top)
-                return traversal
+                return (traversal,traversalf,rejected,rejectedf)
+            
             nextstates=self.getchildren(*top)
-            nextstates.sort(key=self.fvalue) #sort the nextstates based on fvalue in ascending order
+            nextstates.sort(key=self.fvalue)
 
-            for state in reversed(nextstates):  # reversed = so smallest is on top
+            for state in reversed(nextstates):  
                 if state not in self.visited:
+                    rejected.append(state)
+                    rejectedf.append(self.fvalue(state))
                     self.visited.add(state)
                     stack.append(state)
                     self.parent[state] = top
 
-        return traversal
+        return (traversal,traversalf,rejected,rejectedf)
 
 class display:
-    def __init__(self, traversal, parent):
-        self.G = nx.DiGraph()
+    def __init__(self, traversal, parent, traversalf, rejected, rejectedf):
         self.traversal = traversal
+        self.traversalf = traversalf
         self.parent = parent
-        self.positions = {}
-        self.drawgraph()
+        self.rejected = rejected
+        self.rejectedf = rejectedf
 
-    def drawgraph(self):
-        levelmap = {}  # node -> level
-        levelnodes = {}  # level -> list of nodes
+        self.draw_two_graphs()
 
-        # Assign levels to each node
+    def draw_two_graphs(self):
+        fig, axs = plt.subplots(1, 2, figsize=(18, 8))
+        axs[0].set_title("Rejected Nodes (Rejected & Rejected f)")
+        axs[1].set_title("Traversal Nodes (Traversal & Traversal f)")
+
+        # Draw rejected graph
+        G_rejected = nx.DiGraph()
+        pos_rejected = self.get_positions(self.rejected, self.parent)
+        for node in self.rejected:
+            G_rejected.add_node(node)
+            parent = self.parent.get(node)
+            if parent:
+                G_rejected.add_edge(parent, node)
+        labels_rejected = {node: f"{node}\nf={self.rejectedf[i]}" for i, node in enumerate(self.rejected)}
+
+        nx.draw(G_rejected, pos=pos_rejected, ax=axs[0], with_labels=True, labels=labels_rejected,
+                node_color='lightcoral', node_size=1500, font_size=9, font_weight='bold', arrows=True)
+
+        # Draw traversal graph
+        G_traversal = nx.DiGraph()
+        pos_traversal = self.get_positions(self.traversal, self.parent)
         for node in self.traversal:
-            if node == (0, 0):
-                levelmap[node] = 0
-                levelnodes[0] = [node]
+            G_traversal.add_node(node)
+            parent = self.parent.get(node)
+            if parent:
+                G_traversal.add_edge(parent, node)
+        labels_traversal = {node: f"{node}\nf={self.traversalf[i]}" for i, node in enumerate(self.traversal)}
+
+        nx.draw(G_traversal, pos=pos_traversal, ax=axs[1], with_labels=True, labels=labels_traversal,
+                node_color='peachpuff', node_size=1500, font_size=9, font_weight='bold', arrows=True)
+
+        plt.show()
+
+    def get_positions(self, nodes, parent):
+        # Assign levels based on BFS distance from root (0,0)
+        levelmap = {}
+        levelnodes = {}
+
+        if not nodes:
+            return {}
+
+        root = (0,0)
+        levelmap[root] = 0
+        levelnodes[0] = [root]
+
+        # We build levels using parents and nodes given
+        for node in nodes:
+            if node == root:
+                continue
+            p = parent.get(node)
+            if p is not None and p in levelmap:
+                level = levelmap[p] + 1
             else:
-                parent = self.parent.get(node)
-                if parent:
-                    level = levelmap[parent] + 1
-                    levelmap[node] = level
-                    if level not in levelnodes:
-                        levelnodes[level] = []
-                    levelnodes[level].append(node)
+                # Orphan node or root itself, assign level 0 if missing
+                level = 0
+            levelmap[node] = level
+            if level not in levelnodes:
+                levelnodes[level] = []
+            levelnodes[level].append(node)
 
-        self.G.clear()
-        self.positions.clear()
-
-        ygap = 2  # vertical gap between levels
-        xgap = 2  # horizontal gap between nodes
-
+        positions = {}
+        ygap = 2
+        xgap = 2
         for level in sorted(levelnodes.keys()):
-            nodes = levelnodes[level]
-            startx = - (len(nodes) - 1) * xgap / 2  # center the level horizontally
-            for i, node in enumerate(nodes):
+            nodes_at_level = levelnodes[level]
+            startx = - (len(nodes_at_level) - 1) * xgap / 2
+            for i, node in enumerate(nodes_at_level):
                 x = startx + i * xgap
                 y = -level * ygap
-                self.positions[node] = (x, y)
-                self.G.add_node(node)
+                positions[node] = (x, y)
+        return positions
 
-        # Add edges from parent to children
-        for node in self.traversal:
-            parent = self.parent.get(node)
-            if parent and parent in self.traversal:
-                self.G.add_edge(parent, node)
-
-        plt.figure(figsize=(14, 8))
-        nx.draw(self.G, pos=self.positions, with_labels=True,
-                node_color='peachpuff', node_size=2000,
-                font_size=10, font_weight='bold', arrows=True)
-        plt.title("Hill Climb Traversal Tree of Water Jug Problem")
-        plt.show()
 
 if __name__ == "__main__":
     a = int(input("Enter capacity of Jug 1: "))
@@ -119,9 +145,9 @@ if __name__ == "__main__":
     c = int(input("Enter the target amount: "))
 
     solver = waterjug(a, b, c)
-    traversal = solver.hillclimb()
+    traversal, traversalf, rejected, rejectedf = solver.hillclimb()
 
     print("\nHill Climb traversal path:")
     print(" -> ".join(str(state) for state in traversal))
 
-    display(traversal, solver.parent)
+    display(traversal, solver.parent, traversalf, rejected, rejectedf)

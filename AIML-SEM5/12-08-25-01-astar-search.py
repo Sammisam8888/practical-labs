@@ -8,7 +8,6 @@ class waterjug:
         self.target = target
         self.visited = set()
         self.parent = {}
-        self.depthcutoff=1
         
 
     def check(self, x, y):
@@ -34,32 +33,29 @@ class waterjug:
 
         return [state for state in states if self.check(*state)]
 
-    
-    def iterativedeepening(self):
-        def dls(node, depth):
-            traversal.append(node)
-            if (node[0] == self.target and node[1] == 0) or (node[1] == self.target and node[0] == 0):
-                return True
-            if depth == 0:
-                return False
-            for state in self.getchildren(*node):
-                if state not in visited:
-                    visited.add(state)
-                    self.parent[state] = node
-                    if dls(state, depth - 1):
-                        return True
-            return False
 
-        start = (0, 0)
-        traversal = []
-        depth=0
-        while depth < self.depthcutoff:
-            visited = {start}
-            depth += 1
-            if dls(start, self.depthcutoff):
-                return traversal
-            else:
-                self.depthcutoff += 1
+    def h(self, state):
+        x, y = state
+        if x > 0 and x<self.jug1 and y > 0 and y<self.jug2:
+            return 2
+        elif (x>0 and x<self.jug1) or (y>0 and y<self.jug2):
+            return 4
+        elif (x==0 and y==0) or (x==self.jug1 and y==self.jug2):
+            return 10
+        elif (x==0 and y==self.jug2) or ( x==self.jug1 and y==0):
+            return 8
+
+    def f(self, node,depth):
+        return depth+self.h(node)
+
+    def astar(self):
+        open=[] #[(x,y),depth,f]
+        close=[]
+        start=(0,0)
+        open.append([start,0,self.f(start,0)])
+
+        while (open):
+            n=
 
         return traversal
 
@@ -75,30 +71,29 @@ class display:
         levelmap = {}  # node -> level
         levelnodes = {}  # level -> list of nodes
 
-        # Assign level for root
-        root = (0, 0)
-        levelmap[root] = 0
-        levelnodes[0] = [root]
-
-        # Process nodes in traversal order
+        # Assign levels to each node
         for node in self.traversal:
-            if node == root:
-                continue
-            parent = self.parent.get(node)
-            if parent and parent in levelmap:  # only assign if parent's level is known
-                level = levelmap[parent] + 1
-                levelmap[node] = level
-                levelnodes.setdefault(level, []).append(node)
+            if node == (0, 0):
+                levelmap[node] = 0
+                levelnodes[0] = [node]
+            else:
+                parent = self.parent.get(node)
+                if parent:
+                    level = levelmap[parent] + 1
+                    levelmap[node] = level
+                    if level not in levelnodes:
+                        levelnodes[level] = []
+                    levelnodes[level].append(node)
 
         self.G.clear()
         self.positions.clear()
 
-        ygap = 2
-        xgap = 2
+        ygap = 2  # vertical gap between levels
+        xgap = 2  # horizontal gap between nodes
 
         for level in sorted(levelnodes.keys()):
             nodes = levelnodes[level]
-            startx = - (len(nodes) - 1) * xgap / 2
+            startx = - (len(nodes) - 1) * xgap / 2  # center the level horizontally
             for i, node in enumerate(nodes):
                 x = startx + i * xgap
                 y = -level * ygap
@@ -106,15 +101,16 @@ class display:
                 self.G.add_node(node)
 
         # Add edges from parent to children
-        for node, parent in self.parent.items():
-            if parent in self.positions and node in self.positions:
+        for node in self.traversal:
+            parent = self.parent.get(node)
+            if parent and parent in self.traversal:
                 self.G.add_edge(parent, node)
 
         plt.figure(figsize=(14, 8))
         nx.draw(self.G, pos=self.positions, with_labels=True,
                 node_color='peachpuff', node_size=2000,
                 font_size=10, font_weight='bold', arrows=True)
-        plt.title("Iterative Deepening Traversal of Water Jug Problem")
+        plt.title("Hill Climb Traversal Tree of Water Jug Problem")
         plt.show()
 
 if __name__ == "__main__":
@@ -123,13 +119,9 @@ if __name__ == "__main__":
     c = int(input("Enter the target amount: "))
 
     solver = waterjug(a, b, c)
-    traversal = solver.iterativedeepening()
+    traversal = solver.astar()
 
-    print("\nIterative Deepening traversal path:")
-    d=[]
-    for state in traversal:
-        if state not in d:
-            d.append(state)
-    print(" -> ".join(str(state) for state in d))
+    print("\nA* traversal path:")
+    print(" -> ".join(str(state) for state in traversal))
 
     display(traversal, solver.parent)
