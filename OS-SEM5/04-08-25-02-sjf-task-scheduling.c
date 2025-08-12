@@ -5,7 +5,7 @@ void calculatesjf(int n, int* at, int* bt, double* sjf) {
     int ct[n], wt[n], tat[n], visited[n];
     int wtsum = 0, tatsum = 0;
 
-    for (int i = 0; i < n; i++) visited[i] = 0; // 0 = not visited
+    for (int i = 0; i < n; i++) visited[i] = 0; 
 
     printf("Task    Arrival Time   Burst Time   Waiting Time   Completion Time   Turnaround Time\n");
 
@@ -13,14 +13,14 @@ void calculatesjf(int n, int* at, int* bt, double* sjf) {
         int j = -1;
         int minbt = 1e9;
 
-        // Find the shortest job that has arrived
+        
         for (int i = 0; i < n; i++) {
             if (!visited[i] && at[i] <= time) {
                 if (bt[i] < minbt) {
                     minbt = bt[i];
                     j = i;
                 }
-                // Tie-breaker: if burst times are equal, choose earlier arrival
+                
                 else if (bt[i] == minbt && at[i] < at[j]) {
                     j = i;
                 }
@@ -28,7 +28,7 @@ void calculatesjf(int n, int* at, int* bt, double* sjf) {
         }
 
         if (j == -1) {
-            // No process has arrived yet, jump to next arrival
+            
             int nextarrival = 1e9;
             for (int i = 0; i < n; i++) {
                 if (!visited[i] && at[i] < nextarrival) {
@@ -39,7 +39,7 @@ void calculatesjf(int n, int* at, int* bt, double* sjf) {
             continue;
         }
 
-        // Process execution
+        
         time += bt[j];
         ct[j] = time;
         tat[j] = ct[j] - at[j];
@@ -68,10 +68,10 @@ int main() {
     for (int i = 0; i < n; i++) {
         printf("Process %d: ", i + 1);
         scanf("%d %d", &at[i], &bt[i]);
-        pid[i] = i + 1; // Store original process ID
+        pid[i] = i + 1; 
     }
 
-    double sjf[2];.
+    double sjf[2];
     calculatesjf(n, at, bt, sjf);
     printf("Average Waiting Time: %.2f\nAverage Turnaround Time: %.2f\n", sjf[0], sjf[1]);
     return 0;

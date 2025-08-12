@@ -4,15 +4,15 @@ void sortbyarrival(int n, int* at, int* bt, int* pid) {
     for (int i = 0; i < n - 1; i++) {
         for (int j = i + 1; j < n; j++) {
             if (at[j] < at[i]) {
-                // Swap arrival times
+                
                 int temp = at[i];
                 at[i] = at[j];
                 at[j] = temp;
-                // Swap burst times
+                
                 temp = bt[i];
                 bt[i] = bt[j];
                 bt[j] = temp;
-                // Swap process IDs
+                
                 temp = pid[i];
                 pid[i] = pid[j];
                 pid[j] = temp;
@@ -29,13 +29,13 @@ void calculatefcfs(int n, int* at, int* bt, int* pid, double* fcfs) {
     printf("Task    Arrival Time   Burst Time   Waiting Time   Completion Time   Turnaround Time\n");
 
     for (int i = 0; i < n; i++) {
-        if (time < at[i])  // If CPU is idle
+        if (time < at[i])  
             time = at[i];
 
-        time += bt[i];           // Process runs
-        ct[i] = time;            // Completion time
-        tat[i] = ct[i] - at[i];  // Turnaround time
-        wt[i] = tat[i] - bt[i];  // Waiting time
+        time += bt[i];           
+        ct[i] = time;            
+        tat[i] = ct[i] - at[i];  
+        wt[i] = tat[i] - bt[i];  
 
         wtsum += wt[i];
         tatsum += tat[i];
@@ -57,10 +57,10 @@ int main() {
     for (int i = 0; i < n; i++) {
         printf("Process %d: ", i + 1);
         scanf("%d %d", &at[i], &bt[i]);
-        pid[i] = i + 1; // Store original process ID
+        pid[i] = i + 1; 
     }
 
-    // Sort processes by arrival time but keep process IDs
+    
     sortbyarrival(n, at, bt, pid);
 
     double fcfs[2];
