@@ -1,30 +1,30 @@
 #include <stdio.h>
 
-void swap (int a, int b){
-    a=a+b;
-    b=a-b;
-    a=a-b;
+void swap(int *a, int *b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
 }
 
 void sortbyarrival(int n, int* at, int* bt, int* pr, int* pid) {
     for (int i = 0; i < n - 1; i++) {
         for (int j = i + 1; j < n; j++) {
             if (at[j] < at[i]) {
-                swap(at[i],at[j]);
-                swap(bt[i],bt[j]);
-                swap(pid[i],pid[j]);
-                swap(pr[i],pr[j]);
+                swap(&at[i], &at[j]);
+                swap(&bt[i], &bt[j]);
+                swap(&pid[i], &pid[j]);
+                swap(&pr[i], &pr[j]);
             }
         }
     }
 }
 
-void priorityscheduling(int n, int *pid, int* at, int* bt,int* pr, double* prtask) {
+void priorityscheduling(int n, int *pid, int* at, int* bt, int* pr, double* prtask) {
     int completed = 0, time = 0;
     int ct[n], wt[n], tat[n], visited[n];
     int wtsum = 0, tatsum = 0;
 
-    for (int i = 0; i < n; i++) visited[i] = 0; 
+    for (int i = 0; i < n; i++) visited[i] = 0;
 
     printf("Task    Arrival Time   Burst Time   Priority     Waiting Time   Completion Time   Turnaround Time \n");
 
@@ -77,9 +77,9 @@ int main() {
     for (int i = 0; i < n; i++) {
         printf("Process %d: ", i + 1);
         scanf("%d %d %d", &at[i], &bt[i], &pr[i]);
-        pid[i] = i + 1; 
+        pid[i] = i + 1;
     }
-    sortbyarrival(n,at,bt,pr,pid);
+    sortbyarrival(n, at, bt, pr, pid);
     double prtask[2];
     priorityscheduling(n, pid, at, bt, pr, prtask);
     printf("Average Waiting Time: %.2f\nAverage Turnaround Time: %.2f\n", prtask[0], prtask[1]);
