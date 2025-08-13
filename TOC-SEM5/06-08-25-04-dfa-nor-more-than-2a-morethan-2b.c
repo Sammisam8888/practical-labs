@@ -22,8 +22,8 @@ bool q0(char s[],int i){
 
 bool q1(char s[],int i){
 	if (s[i]=='\0') return 0; 
-	else if (s[i]=='a') return q2(s,++i); //reject state
-	else return q8(s,++i);
+	else if (s[i]=='a') return q8(s,++i); //reject state
+	else return q2(s,++i);
 }
 
 bool q2(char s[],int i){
@@ -39,7 +39,7 @@ bool q3(char s[],int i){
 }
 
 bool q4(char s[],int i){
-    if (s[i]=='\0') return 0; 
+    if (s[i]=='\0') return 1; 
     else if (s[i]=='b') return q4(s,++i);
     else return 0;
 }
@@ -74,7 +74,7 @@ bool q8(char s[],int i){
 
 bool q9(char s[],int i){
     if (s[i]=='\0') return 0; 
-    else if (s[i]=='a') return 0;
+    else if (s[i]=='b') return 0;
     else return q7(s,++i);
 }
 

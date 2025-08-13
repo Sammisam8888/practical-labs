@@ -39,7 +39,7 @@ bool q4(char s[],int i){
     else if (s[i]=='b') return q5(s,++i);
     else return q4(s,++i);
 }
-
+ 
 bool q5(char s[],int i){
     if (s[i]=='\0') return 0; 
     else if (s[i]=='b') return q3(s,++i);

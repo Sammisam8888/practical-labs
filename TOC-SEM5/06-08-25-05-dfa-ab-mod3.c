@@ -1,5 +1,3 @@
-//atmost 2a and more than 2b
-
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
