@@ -1,4 +1,5 @@
-// L= {w: na(w) mod 3 = nb(w) mod 3}
+// L= {w: na(w) mod 3 >nb(w)mod 3}
+// w=a or w=aab or w=aa
 
 #include <stdio.h>
 #include <stdbool.h>
@@ -38,7 +39,7 @@ bool q10(char s[],int i){
 }
 
 bool q11(char s[],int i){
-    if (s[i]=='\0') return 1; 
+    if (s[i]=='\0') return 0; 
     else if (s[i]=='a') return q21(s,++i);
     else return q12(s,++i);
 }
@@ -51,21 +52,21 @@ bool q12(char s[],int i){
 
 
 bool q20(char s[],int i){
-    if (s[i]=='\0') return 0; 
+    if (s[i]=='\0') return 1; 
     else if (s[i]=='a') return q00(s,++i);
     else return q21(s,++i);
 }
 
 
 bool q21(char s[],int i){
-    if (s[i]=='\0') return 0; 
+    if (s[i]=='\0') return 1; 
     else if (s[i]=='a') return q02(s,++i);
     else return q22(s,++i);
 }
 
 
 bool q22(char s[],int i){
-    if (s[i]=='\0') return 1; 
+    if (s[i]=='\0') return 0; 
     else if (s[i]=='a') return q02(s,++i);
     else return q20(s,++i);
 }
@@ -83,7 +84,7 @@ int main(){
 		}
 		i++;
 	}
-	
-	printf("The given string %s %s satisfy the condition of a mod 3 = b mod 3\n",s,(q00(s,0)?"does":"doesn't"));
+
+	printf("The given string %s %s satisfy the condition of a mod 3 > b mod 3\n",s,(q00(s,0)?"does":"doesn't"));
 	return 0;
 }

@@ -1,4 +1,4 @@
-// L= {w: na(w) mod 3 = nb(w) mod 3}
+// L= {w :(na(w) – nb(w)) mod 3 > 0}
 
 #include <stdio.h>
 #include <stdbool.h>
@@ -32,13 +32,13 @@ bool q02(char s[],int i){
 }
 
 bool q10(char s[],int i){
-	if (s[i]=='\0') return 1; //satisfied   
+	if (s[i]=='\0') return 1; //satisfied  
 	else if (s[i]=='a') return q20(s,++i) ; //reject state
 	else return q11(s,++i);
 }
 
 bool q11(char s[],int i){
-    if (s[i]=='\0') return 1; 
+    if (s[i]=='\0') return 0; 
     else if (s[i]=='a') return q21(s,++i);
     else return q12(s,++i);
 }
@@ -51,21 +51,21 @@ bool q12(char s[],int i){
 
 
 bool q20(char s[],int i){
-    if (s[i]=='\0') return 0; 
+    if (s[i]=='\0') return 1; 
     else if (s[i]=='a') return q00(s,++i);
     else return q21(s,++i);
 }
 
 
 bool q21(char s[],int i){
-    if (s[i]=='\0') return 0; 
+    if (s[i]=='\0') return 1; 
     else if (s[i]=='a') return q02(s,++i);
     else return q22(s,++i);
 }
 
 
 bool q22(char s[],int i){
-    if (s[i]=='\0') return 1; 
+    if (s[i]=='\0') return 0; 
     else if (s[i]=='a') return q02(s,++i);
     else return q20(s,++i);
 }
@@ -75,7 +75,7 @@ int main(){
 	char s[100];
 	scanf("%s",s);
 	int i=0;
-	
+
 	while (s[i]!='\0'){
 		if (!(s[i]=='a' || s[i]=='b')){
 			printf("The provided input is not a valid combination of a & b");
@@ -83,7 +83,7 @@ int main(){
 		}
 		i++;
 	}
-	
-	printf("The given string %s %s satisfy the condition of a mod 3 = b mod 3\n",s,(q00(s,0)?"does":"doesn't"));
+
+	printf("The given string %s %s satisfy the condition of (na(w) – nb(w)) mod 3 > 0\n",s,(q00(s,0)?"does":"doesn't"));
 	return 0;
 }

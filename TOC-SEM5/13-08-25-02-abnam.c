@@ -67,7 +67,7 @@ int main(){
 		}
 		i++;
 	}
-	
-	printf("The given string %s %s satisfy the condition of ab^na^m : n ≥ 2,m ≥3\n",s,(q0(s,0)?"does":"doesn't"));
+
+	printf("The given string %s %s satisfy the condition of (ab^na^m : n ≥ 2,m ≥3)\n",s,(q0(s,0)?"does":"doesn't"));
 	return 0;
 }
