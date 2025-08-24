@@ -76,7 +76,7 @@ void roundrobin(int n, int *pid, int* at, int* bt, double* rr) {
     printf("|\n\n");
 
     // Final Table
-    printf("Task    Arrival Time   Burst Time     Waiting Time   Completion Time   Turnaround Time \n");
+    printf("Task    Arrival Time   Burst Time   Waiting Time   Completion Time   Turnaround Time \n");
     for (int i = 0; i < n; i++) {
         printf(" P%-6d %-13d %-12d %-14d %-17d %-15d\n",
                pid[i], at[i], bt[i], wt[i], ct[i], tat[i]);

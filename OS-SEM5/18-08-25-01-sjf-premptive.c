@@ -25,7 +25,6 @@ void sjfpremptive(int n, int *pid, int* at, int* bt, double* sjftask) {
 
     int wtsum = 0, tatsum = 0;
 
-    printf("Task    Arrival Time   Burst Time     Waiting Time   Completion Time   Turnaround Time \n");
 
     // For Gantt chart
     printf("\nGantt Chart:\n");
@@ -77,6 +76,7 @@ void sjfpremptive(int n, int *pid, int* at, int* bt, double* sjftask) {
     }
 
     printf("|\n\n");
+    printf("Task    Arrival Time   Burst Time   Waiting Time   Completion Time   Turnaround Time \n");
 
     // Table of processes
     for (int i = 0; i < n; i++) {
