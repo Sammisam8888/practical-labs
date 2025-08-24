@@ -12,7 +12,7 @@ void sortbyarrival(int n, int* at, int* bt, int* pid) {
             if (at[j] < at[i]) {
                 swap(&at[i], &at[j]);
                 swap(&bt[i], &bt[j]);
-                swap(&pid[i], &pid[j]);
+                swap(&pid[i], &pid[j]); 
             }
         }
     }
@@ -27,25 +27,38 @@ void sjfpremptive(int n, int *pid, int* at, int* bt, double* sjftask) {
 
     printf("Task    Arrival Time   Burst Time     Waiting Time   Completion Time   Turnaround Time \n");
 
-    while (completed < n) {
+    // For Gantt chart
+    printf("\nGantt Chart:\n");
+    int prev = -1; // track previous running process
 
-        int j = -1,minbtr=1e9;
-        for (int i=0;i<n; i++){
+    while (completed < n) {
+        int j = -1, minbtr = 1e9;
+
+        for (int i = 0; i < n; i++) {
             if (at[i] <= time && btr[i] > 0) {
-                if (btr[i]<minbtr){
+                if (btr[i] < minbtr) {
                     minbtr = btr[i];
                     j = i;
-                }
-                else if (btr[i] == minbtr && at[i] < at[j]) {
+                } else if (btr[i] == minbtr && at[i] < at[j]) {
                     j = i;
                 }
             }
-    }
-        if (j == -1) {
-            //one second system was idle\
+        }
 
+        if (j == -1) {
+            // CPU idle
+            if (prev != -2) { // print "Idle" only once continuously
+                printf("| %d Idle ", time);
+                prev = -2;
+            }
             time++;
             continue;
+        }
+
+        // Context switch detection
+        if (prev != j) {
+            printf("| %d P%d ", time, pid[j]);
+            prev = j;
         }
 
         btr[j]--;
@@ -59,9 +72,16 @@ void sjfpremptive(int n, int *pid, int* at, int* bt, double* sjftask) {
             wtsum += wt[j];
             tatsum += tat[j];
 
-            printf(" P%-6d %-13d %-12d %-14d %-17d %-15d\n",
-                   pid[j], at[j], bt[j], wt[j], ct[j], tat[j]);
+            printf("%d", time); // print end time when process finishes
         }
+    }
+
+    printf("|\n\n");
+
+    // Table of processes
+    for (int i = 0; i < n; i++) {
+        printf(" P%-6d %-13d %-12d %-14d %-17d %-15d\n",
+               pid[i], at[i], bt[i], wt[i], ct[i], tat[i]);
     }
 
     sjftask[0] = (double)wtsum / n;
