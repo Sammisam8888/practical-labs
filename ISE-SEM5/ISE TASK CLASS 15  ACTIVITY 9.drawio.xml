@@ -1,0 +1,339 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36" version="28.1.1">
+  <diagram name="Fire Safety Mind Map" id="L-9mP_kZ3yRcV4wX7bQj">
+    <mxGraphModel dx="1097" dy="578" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="100" value="Fire Safety" style="ellipse;whiteSpace=wrap;html=1;fontSize=24;fontStyle=1;fillColor=#f8cecc;strokeColor=#b85450;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="767" y="525" width="180" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="900" value="Peer 1 : Samuel Priyatam Dash&lt;br&gt;Reg. No: 2302040025" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=22;fontStyle=1" parent="1" vertex="1">
+          <mxGeometry x="50" y="40" width="350" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="901" value="Peer 2 : Dipun Barik&lt;br&gt;Reg. No: 2302040008" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=22;fontStyle=1" parent="1" vertex="1">
+          <mxGeometry x="50" y="90" width="230" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="101" value="Types of Fire" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fontStyle=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="777" y="190" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="102" value="" style="endArrow=classic;html=1;rounded=0;edgeStyle=entityRelationEdgeStyle;strokeColor=#6c8ebf;strokeWidth=2;" parent="1" source="100" target="101" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="857" y="525" as="sourcePoint" />
+            <mxPoint x="857" y="270" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="110" value="Class A&lt;br&gt;&lt;i&gt;Ordinary Combustibles&lt;/i&gt;&lt;br&gt;(Wood, Paper, Cloth)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1eefe;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="467" y="60" width="140" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="111" value="Class B&lt;br&gt;&lt;i&gt;Flammable Liquids&lt;/i&gt;&lt;br&gt;(Gasoline, Oil, Paint)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1eefe;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="627" y="60" width="140" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="112" value="Class C&lt;br&gt;&lt;i&gt;Electrical Equipment&lt;/i&gt;&lt;br&gt;(Energized Circuits)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1eefe;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="787" y="60" width="140" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="113" value="Class D&lt;br&gt;&lt;i&gt;Combustible Metals&lt;/i&gt;&lt;br&gt;(Magnesium, Titanium)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1eefe;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="947" y="60" width="140" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="114" value="Class E / K&lt;br&gt;&lt;i&gt;Cooking Oils &amp;amp; Fats&lt;/i&gt;&lt;br&gt;(Kitchen Fires)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1eefe;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="1107" y="60" width="140" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="115" value="" style="endArrow=none;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;strokeColor=#6c8ebf;" parent="1" source="101" target="112" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="116" value="" style="endArrow=none;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;strokeColor=#6c8ebf;" parent="1" source="112" target="110" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="117" value="" style="endArrow=none;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;strokeColor=#6c8ebf;" parent="1" source="112" target="111" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="118" value="" style="endArrow=none;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;strokeColor=#6c8ebf;" parent="1" source="112" target="113" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="119" value="" style="endArrow=none;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;strokeColor=#6c8ebf;" parent="1" source="112" target="114" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="201" value="Fire Triangle" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fontStyle=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="1087" y="315" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="202" value="" style="endArrow=classic;html=1;rounded=0;edgeStyle=entityRelationEdgeStyle;strokeColor=#82b366;strokeWidth=2;" parent="1" source="100" target="201" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="947" y="585" as="sourcePoint" />
+            <mxPoint x="1087" y="355" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="210" value="&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;HEAT&lt;/span&gt;&lt;/div&gt;&lt;i&gt;Activation Energy&lt;/i&gt;" style="shape=triangle;perimeter=trianglePerimeter;whiteSpace=wrap;html=1;fillColor=#eaf5ea;strokeColor=#82b366;align=left;fontSize=14;fontStyle=0" parent="1" vertex="1">
+          <mxGeometry x="1472" y="200" width="148" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="211" value="FUEL&lt;br&gt;&lt;i&gt;Combustible Material&lt;/i&gt;" style="shape=triangle;perimeter=trianglePerimeter;whiteSpace=wrap;html=1;fillColor=#eaf5ea;strokeColor=#82b366;align=left;fontSize=14;fontStyle=0" parent="1" vertex="1">
+          <mxGeometry x="1280" y="300" width="120" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="212" value="OXYGEN&lt;br&gt;&lt;i&gt;Oxidizing Agent&lt;/i&gt;" style="shape=triangle;perimeter=trianglePerimeter;whiteSpace=wrap;html=1;fillColor=#eaf5ea;strokeColor=#82b366;align=left;fontSize=14;fontStyle=0" parent="1" vertex="1">
+          <mxGeometry x="1460" y="375" width="150" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="213" value="" style="endArrow=none;html=1;rounded=0;edgeStyle=elbowEdgeStyle;strokeColor=#82b366;align=left;fontStyle=0" parent="1" target="210" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1390" y="350" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="214" value="" style="endArrow=none;html=1;rounded=0;edgeStyle=elbowEdgeStyle;strokeColor=#82b366;align=left;fontStyle=0" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1270" y="354" as="sourcePoint" />
+            <mxPoint x="1240" y="360" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="1260" y="360" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="215" value="" style="endArrow=none;html=1;rounded=0;edgeStyle=elbowEdgeStyle;strokeColor=#82b366;align=left;fontStyle=0" parent="1" source="211" target="212" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1390" y="360" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="301" value="Hazards, Prevention &amp;amp; Protection" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fontStyle=1;fillColor=#ffe6cc;strokeColor=#d79b00;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="1087" y="745" width="180" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="302" value="" style="endArrow=classic;html=1;rounded=0;edgeStyle=entityRelationEdgeStyle;strokeColor=#d79b00;strokeWidth=2;" parent="1" source="100" target="301" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="947" y="645" as="sourcePoint" />
+            <mxPoint x="1097" y="745" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="tDLflApgfnSTmktItofq-909" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="310" target="tDLflApgfnSTmktItofq-908">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="310" value="Fire Hazards" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d79b00;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="1317" y="655" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="311" value="Prevention" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d79b00;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="1317" y="770" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="312" value="Protection" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d79b00;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="1317" y="885" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="313" value="" style="endArrow=none;html=1;rounded=0;edgeStyle=elbowEdgeStyle;strokeColor=#d79b00;" parent="1" source="301" target="310" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="314" value="" style="endArrow=none;html=1;rounded=0;edgeStyle=elbowEdgeStyle;strokeColor=#d79b00;" parent="1" source="301" target="311" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="315" value="" style="endArrow=none;html=1;rounded=0;edgeStyle=elbowEdgeStyle;strokeColor=#d79b00;" parent="1" source="301" target="312" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="323" value="" style="endArrow=none;html=1;rounded=0;edgeStyle=elbowEdgeStyle;strokeColor=#d79b00;" parent="1" source="310" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1457" y="680" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="324" value="" style="endArrow=none;html=1;rounded=0;edgeStyle=elbowEdgeStyle;strokeColor=#d79b00;" parent="1" source="311" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1490" y="795" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="325" value="" style="endArrow=none;html=1;rounded=0;edgeStyle=elbowEdgeStyle;strokeColor=#d79b00;" parent="1" source="312" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1457" y="910" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="401" value="Fire Extinguishers" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fontStyle=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="787" y="870" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="402" value="" style="endArrow=classic;html=1;rounded=0;edgeStyle=entityRelationEdgeStyle;strokeColor=#9673a6;strokeWidth=2;" parent="1" source="100" target="401" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="857" y="645" as="sourcePoint" />
+            <mxPoint x="867" y="870" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="410" value="Portable Fire Extinguishers (PFE)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0e9f4;strokeColor=#9673a6;" parent="1" vertex="1">
+          <mxGeometry x="877" y="965" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="411" value="Types:&lt;br&gt;Water, Foam, CO2, Dry Powder, Wet Chemical" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0e9f4;strokeColor=#9673a6;" parent="1" vertex="1">
+          <mxGeometry x="1050" y="965" width="140" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="412" value="How to Use:&lt;br&gt;&lt;b&gt;PASS Method&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0e9f4;strokeColor=#9673a6;" parent="1" vertex="1">
+          <mxGeometry x="627" y="950" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="413" value="" style="endArrow=none;html=1;rounded=0;edgeStyle=elbowEdgeStyle;strokeColor=#9673a6;" parent="1" source="401" target="410" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="414" value="" style="endArrow=none;html=1;rounded=0;edgeStyle=elbowEdgeStyle;strokeColor=#9673a6;" parent="1" source="410" target="411" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="415" value="" style="endArrow=none;html=1;rounded=0;edgeStyle=elbowEdgeStyle;strokeColor=#9673a6;" parent="1" source="410" target="412" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="420" value="P&lt;br&gt;Pull the pin" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8f2fa;strokeColor=#9673a6;" parent="1" vertex="1">
+          <mxGeometry x="380" y="1080" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="421" value="A&lt;br&gt;Aim at the base" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8f2fa;strokeColor=#9673a6;" parent="1" vertex="1">
+          <mxGeometry x="490.5" y="1100" width="113" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="422" value="S&lt;br&gt;Squeeze the lever" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8f2fa;strokeColor=#9673a6;" parent="1" vertex="1">
+          <mxGeometry x="647" y="1100" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="423" value="S&lt;br&gt;Sweep side to side" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8f2fa;strokeColor=#9673a6;" parent="1" vertex="1">
+          <mxGeometry x="777" y="1100" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="424" value="" style="endArrow=classic;html=1;rounded=0;edgeStyle=elbowEdgeStyle;strokeColor=#9673a6;" parent="1" source="412" target="420" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="697" y="1060" as="sourcePoint" />
+            <mxPoint x="457" y="1080" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="430" y="1020" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="425" value="" style="endArrow=classic;html=1;rounded=0;edgeStyle=elbowEdgeStyle;strokeColor=#9673a6;" parent="1" source="412" target="421" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="697" y="1060" as="sourcePoint" />
+            <mxPoint x="577" y="1080" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="426" value="" style="endArrow=classic;html=1;rounded=0;edgeStyle=elbowEdgeStyle;strokeColor=#9673a6;" parent="1" source="412" target="422" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="697" y="1060" as="sourcePoint" />
+            <mxPoint x="697" y="1080" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="427" value="" style="endArrow=classic;html=1;rounded=0;edgeStyle=elbowEdgeStyle;strokeColor=#9673a6;" parent="1" target="423" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="697" y="1010" as="sourcePoint" />
+            <mxPoint x="817" y="1080" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="820" y="1070" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="501" value="Detection, Alarms, &amp;amp; Firefighting Systems" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fontStyle=1;fillColor=#f5f5f5;strokeColor=#666666;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="457" y="745" width="180" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="502" value="" style="endArrow=classic;html=1;rounded=0;edgeStyle=entityRelationEdgeStyle;strokeColor=#666666;strokeWidth=2;" parent="1" source="100" target="501" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="767" y="645" as="sourcePoint" />
+            <mxPoint x="637" y="745" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="tDLflApgfnSTmktItofq-903" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="510" target="tDLflApgfnSTmktItofq-902">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="510" value="Detection Devices" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8e8e8;strokeColor=#666666;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="277" y="655" width="130" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="tDLflApgfnSTmktItofq-905" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="511" target="tDLflApgfnSTmktItofq-904">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="511" value="Alarm Systems" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8e8e8;strokeColor=#666666;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="277" y="770" width="130" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="tDLflApgfnSTmktItofq-907" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="512" target="tDLflApgfnSTmktItofq-906">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="512" value="Firefighting Systems" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8e8e8;strokeColor=#666666;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="277" y="915" width="130" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="513" value="" style="endArrow=none;html=1;rounded=0;edgeStyle=elbowEdgeStyle;strokeColor=#666666;" parent="1" source="501" target="510" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="514" value="" style="endArrow=none;html=1;rounded=0;edgeStyle=elbowEdgeStyle;strokeColor=#666666;" parent="1" source="501" target="511" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="515" value="" style="endArrow=none;html=1;rounded=0;edgeStyle=elbowEdgeStyle;strokeColor=#666666;" parent="1" source="501" target="512" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="523" value="" style="endArrow=none;html=1;rounded=0;edgeStyle=elbowEdgeStyle;strokeColor=#666666;" parent="1" source="510" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="257" y="680" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="524" value="" style="endArrow=none;html=1;rounded=0;edgeStyle=elbowEdgeStyle;strokeColor=#666666;" parent="1" source="511" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="257" y="795" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="601" value="Safety Signs &amp;amp; Instructions" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fontStyle=1;fillColor=#e2f0d9;strokeColor=#99cc00;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="457" y="315" width="180" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="602" value="" style="endArrow=classic;html=1;rounded=0;edgeStyle=entityRelationEdgeStyle;strokeColor=#99cc00;strokeWidth=2;" parent="1" source="100" target="601" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="767" y="525" as="sourcePoint" />
+            <mxPoint x="637" y="355" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="610" value="Prohibition (Red)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f1f9ec;strokeColor=#99cc00;" parent="1" vertex="1">
+          <mxGeometry x="247" y="225" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="611" value="Warning (Yellow)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f1f9ec;strokeColor=#99cc00;" parent="1" vertex="1">
+          <mxGeometry x="247" y="285" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="612" value="Mandatory (Blue)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f1f9ec;strokeColor=#99cc00;" parent="1" vertex="1">
+          <mxGeometry x="247" y="345" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="613" value="Safe / Escape (Green)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f1f9ec;strokeColor=#99cc00;" parent="1" vertex="1">
+          <mxGeometry x="247" y="405" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="614" value="Fire Equipment (Red)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f1f9ec;strokeColor=#99cc00;" parent="1" vertex="1">
+          <mxGeometry x="247" y="465" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="615" value="" style="endArrow=none;html=1;rounded=0;edgeStyle=elbowEdgeStyle;strokeColor=#99cc00;" parent="1" source="601" target="610" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="616" value="" style="endArrow=none;html=1;rounded=0;edgeStyle=elbowEdgeStyle;strokeColor=#99cc00;" parent="1" source="601" target="611" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="617" value="" style="endArrow=none;html=1;rounded=0;edgeStyle=elbowEdgeStyle;strokeColor=#99cc00;" parent="1" source="601" target="612" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="618" value="" style="endArrow=none;html=1;rounded=0;edgeStyle=elbowEdgeStyle;strokeColor=#99cc00;" parent="1" source="601" target="613" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="619" value="" style="endArrow=none;html=1;rounded=0;edgeStyle=elbowEdgeStyle;strokeColor=#99cc00;" parent="1" source="601" target="614" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="701" value="Steps After a Fire Occurs" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fontStyle=1;fillColor=#deebf7;strokeColor=#3366ff;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="457" y="525" width="180" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="702" value="" style="endArrow=classic;html=1;rounded=0;edgeStyle=entityRelationEdgeStyle;strokeColor=#3366ff;strokeWidth=2;" parent="1" source="100" target="701" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="767" y="585" as="sourcePoint" />
+            <mxPoint x="637" y="565" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="710" value="R.A.C.E.&lt;br&gt;Rescue&lt;br&gt;Alarm&lt;br&gt;Confine&lt;br&gt;Extinguish / Evacuate" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eaf2fb;strokeColor=#3366ff;" parent="1" vertex="1">
+          <mxGeometry x="247" y="520" width="140" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="711" value="" style="endArrow=classic;html=1;rounded=0;edgeStyle=elbowEdgeStyle;strokeColor=#3366ff;" parent="1" source="701" target="710" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="457" y="565" as="sourcePoint" />
+            <mxPoint x="387" y="565" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="713" value="" style="endArrow=classic;html=1;rounded=0;edgeStyle=elbowEdgeStyle;strokeColor=#3366ff;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="710" target="tDLflApgfnSTmktItofq-901" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="247" y="565" as="sourcePoint" />
+            <mxPoint x="177" y="557.5" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="tDLflApgfnSTmktItofq-901" value="&lt;font style=&quot;&quot;&gt;&lt;span style=&quot;text-align: left;&quot;&gt;• Sound the Alarm&lt;/span&gt;&lt;br style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;text-align: left;&quot;&gt;• Evacuate Immediately&lt;/span&gt;&lt;br style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;text-align: left;&quot;&gt;• Call Emergency Services&lt;/span&gt;&lt;br style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;text-align: left;&quot;&gt;• Go to Assembly Point&lt;/span&gt;&lt;br style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;text-align: left;&quot;&gt;• Do Not Re-enter&lt;/span&gt;&lt;br style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;text-align: left;&quot;&gt;• Headcount&lt;/span&gt;&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=light-dark(#A20025,#660000);strokeColor=#6F0000;fontColor=light-dark(#FFFFFF,#FFFFFF);fillStyle=solid;" vertex="1" parent="1">
+          <mxGeometry x="50" y="500" width="160" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="tDLflApgfnSTmktItofq-902" value="&lt;font style=&quot;&quot;&gt;&lt;span style=&quot;text-align: left;&quot;&gt;• Smoke Detectors&lt;/span&gt;&lt;br style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;text-align: left;&quot;&gt;• Heat Detectors&lt;/span&gt;&lt;br style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;text-align: left;&quot;&gt;• Flame Detectors&lt;/span&gt;&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=light-dark(#A20025,#660000);strokeColor=#6F0000;fontColor=light-dark(#FFFFFF,#FFFFFF);fillStyle=solid;" vertex="1" parent="1">
+          <mxGeometry x="60" y="625" width="160" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="tDLflApgfnSTmktItofq-904" value="&lt;span style=&quot;text-align: left;&quot;&gt;• Bells / Sirens&lt;/span&gt;&lt;br style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;text-align: left;&quot;&gt;• Strobe Lights&lt;/span&gt;&lt;br style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;text-align: left;&quot;&gt;• Voice Evacuation&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=light-dark(#A20025,#660000);strokeColor=#6F0000;fontColor=light-dark(#FFFFFF,#FFFFFF);fillStyle=solid;" vertex="1" parent="1">
+          <mxGeometry x="60" y="750" width="160" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="tDLflApgfnSTmktItofq-906" value="&lt;span style=&quot;text-align: left;&quot;&gt;• Sprinkler Systems&lt;/span&gt;&lt;br style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;text-align: left;&quot;&gt;• Hydrants&lt;/span&gt;&lt;br style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;text-align: left;&quot;&gt;• Hose Reels&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=light-dark(#A20025,#660000);strokeColor=#6F0000;fontColor=light-dark(#FFFFFF,#FFFFFF);fillStyle=solid;" vertex="1" parent="1">
+          <mxGeometry x="60" y="885" width="160" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="tDLflApgfnSTmktItofq-908" value="&lt;span style=&quot;text-align: left;&quot;&gt;• Faulty Wiring&lt;/span&gt;&lt;br style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;text-align: left;&quot;&gt;• Flammable Materials&lt;/span&gt;&lt;br style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;text-align: left;&quot;&gt;• Human Error&lt;/span&gt;&lt;br style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;text-align: left;&quot;&gt;• Arson&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=light-dark(#A20025,#660000);strokeColor=#6F0000;fontColor=light-dark(#FFFFFF,#FFFFFF);fillStyle=solid;" vertex="1" parent="1">
+          <mxGeometry x="1466" y="625" width="160" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="tDLflApgfnSTmktItofq-910" value="&lt;span style=&quot;text-align: left;&quot;&gt;• Good Housekeeping&lt;/span&gt;&lt;br style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;text-align: left;&quot;&gt;• Regular Maintenance&lt;/span&gt;&lt;br style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;text-align: left;&quot;&gt;• Proper Storage&lt;/span&gt;&lt;br style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;text-align: left;&quot;&gt;• Training &amp;amp; Awareness&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=light-dark(#A20025,#660000);strokeColor=#6F0000;fontColor=light-dark(#FFFFFF,#FFFFFF);fillStyle=solid;" vertex="1" parent="1">
+          <mxGeometry x="1466" y="740" width="160" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="tDLflApgfnSTmktItofq-911" value="&lt;span style=&quot;text-align: left;&quot;&gt;• Fire Doors&lt;/span&gt;&lt;br style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;text-align: left;&quot;&gt;• Sprinkler Systems&lt;/span&gt;&lt;br style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;text-align: left;&quot;&gt;• Fire-resistant materials&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=light-dark(#A20025,#660000);strokeColor=#6F0000;fontColor=light-dark(#FFFFFF,#FFFFFF);fillStyle=solid;" vertex="1" parent="1">
+          <mxGeometry x="1466" y="860" width="160" height="110" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
