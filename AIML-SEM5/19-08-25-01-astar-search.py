@@ -1,177 +1,76 @@
-
 import matplotlib.pyplot as plt
 import networkx as nx
+from networkx.drawing.nx_pydot import graphviz_layout
+import heapq
 
-class waterjug:
-    def __init__(self, jug1, jug2, target):
-        self.jug1 = jug1
-        self.jug2 = jug2
-        self.target = target
-        self.visited = set()
-        self.parent = {}
-        
+class PQ:
+    def __init__(s): s.q=[]
+    def empty(s): return not s.q
+    def put(s,i,p): heapq.heappush(s.q,(p,i))
+    def get(s): return heapq.heappop(s.q)[1]
 
-    def check(self, x, y):
-        return 0 <= x <= self.jug1 and 0 <= y <= self.jug2
+def nxt_states(st,lvl):
+    x,y=st; a,b=lvl
+    ns=[(a,y),(x,b),(0,y),(x,0)]
+    m=min(x,b-y); ns.append((x-m,y+m))
+    m=min(y,a-x); ns.append((x+m,y-m))
+    return list(set(ns))
 
-    def getchildren(self, x, y):
-        states = []
+def h(st,gl): return abs(st[0]-gl[0])+abs(st[1]-gl[1])
 
-        # Fill Jug1
-        states.append((self.jug1, y))
-        # Fill Jug2
-        states.append((x, self.jug2))
-        # Empty Jug1
-        states.append((0, y))
-        # Empty Jug2
-        states.append((x, 0))
-        # Pour Jug1 -> Jug2
-        pour = min(x, self.jug2 - y)
-        states.append((x - pour, y + pour))
-        # Pour Jug2 -> Jug1
-        pour = min(y, self.jug1 - x)
-        states.append((x + pour, y - pour))
+def astar(st,gl,lvl):
+    pq=PQ(); pq.put(st,0)
+    gsc={st:0}; prev={st:None}; G=nx.DiGraph()
+    G.add_node(st); d=0; draw(G,prev,st,gl,gsc,d,st); d+=1
 
-        return [state for state in states if self.check(*state)]
+    while not pq.empty():
+        cur=pq.get()
+        if cur==gl: draw(G,prev,st,gl,gsc,d,cur); break
+        for ch in nxt_states(cur,lvl):
+            t=gsc[cur]+1
+            if ch not in gsc or t<gsc[ch]:
+                gsc[ch]=t; f=t+h(ch,gl); prev[ch]=cur
+                pq.put(ch,f); G.add_edge(cur,ch,weight=t)
+        draw(G,prev,st,gl,gsc,d,cur); d+=1
+    return G,prev,gsc
 
+def draw(G,prev,st,gl,gsc,d,cur):
+    pos=graphviz_layout(G,prog='dot'); plt.figure(figsize=(10,7))
+    lbls={n:f"{n}\nh={h(n,gl)}" for n in G.nodes()}
+    nx.draw(G,pos,labels=lbls,with_labels=True,node_color='lightyellow',node_size=700,font_size=8)
+    nx.draw_networkx_edge_labels(G,pos,edge_labels={(u,v):gsc[v] for u,v in G.edges()},font_size=7)
 
-    def h(self, state):
-        x, y = state
-        if x > 0 and x<self.jug1 and y > 0 and y<self.jug2:
-            return 2
-        elif (x>0 and x<self.jug1) or (y>0 and y<self.jug2):
-            return 4
-        elif (x==0 and y==0) or (x==self.jug1 and y==self.jug2):
-            return 10
-        elif (x==0 and y==self.jug2) or ( x==self.jug1 and y==0):
-            return 8
+    if cur in prev:
+        p=[]; t=cur
+        while t is not None: p.append(t); t=prev[t]
+        p.reverse(); e=[(p[i],p[i+1]) for i in range(len(p)-1)]
+        nx.draw_networkx_edges(G,pos,edgelist=e,edge_color='green',width=3)
 
-    def f(self, node,depth):
-        return depth+self.h(node)
+    nx.draw_networkx_nodes(G,pos,nodelist=[st],node_color='lightblue',node_size=800)
+    if gl in G.nodes(): nx.draw_networkx_nodes(G,pos,nodelist=[gl],node_color='lightcoral',node_size=800)
+    plt.title(f"A* Search - Depth {d}"); plt.show()
 
-    def astar(self, show_step_by_step=False):
-        open_list = []  # [(state, depth, f)]
-        closed_set = set()
-        start = (0, 0)
-        open_list.append([start, 0, self.f(start, 0)])
-        self.parent = {start: None}
+def final(G,prev,st,gl,gsc):
+    pos=graphviz_layout(G,prog='dot'); plt.figure(figsize=(12,9))
+    lbls={n:f"{n}\nh={h(n,gl)}" for n in G.nodes()}
+    nx.draw(G,pos,labels=lbls,with_labels=True,node_color='orange',node_size=700,font_size=8)
+    nx.draw_networkx_edge_labels(G,pos,edge_labels={(u,v):gsc[v] for u,v in G.edges()},font_size=7)
 
+    if gl in prev:
+        p=[]; t=gl
+        while t is not None: p.append(t); t=prev[t]
+        p.reverse(); e=[(p[i],p[i+1]) for i in range(len(p)-1)]
+        nx.draw_networkx_edges(G,pos,edgelist=e,edge_color='green',width=3)
+        print("Final Path:", " -> ".join(map(str,p)))
 
-        last_depth = -1
-        while open_list:
-            # Sort by f value (lowest first)
-            open_list.sort(key=lambda x: x[2])
-            node, depth, f_val = open_list.pop(0)
+    nx.draw_networkx_nodes(G,pos,nodelist=[st],node_color='lightblue',node_size=800)
+    if gl in G.nodes(): nx.draw_networkx_nodes(G,pos,nodelist=[gl],node_color='lightcoral',node_size=800)
+    plt.title("Final A* Path"); plt.show()
 
-            if node in closed_set:
-                continue
-            closed_set.add(node)
-
-            # Print/display at each step: show all expanded nodes so far
-            if show_step_by_step:
-                print(f"\nA* Step {len(closed_set)} (expanding node {node}):")
-                print("Expanded nodes so far:")
-                print(", ".join(str(n) for n in closed_set))
-
-            # Check if target is reached in either jug
-            if node[0] == self.target or node[1] == self.target:
-                # Reconstruct patha
-                traversal = []
-                curr = node
-                while curr is not None:
-                    traversal.append(curr)
-                    curr = self.parent[curr]
-                traversal.reverse()
-                return traversal
-
-            for child in self.getchildren(*node):
-                if child not in closed_set and child not in [n[0] for n in open_list]:
-                    self.parent[child] = node
-                    open_list.append([child, depth + 1, self.f(child, depth + 1)])
-        # If no solution found
-        return []
-
-def plot_astar_traversal(traversal, parent, closed_set=None):
-    """
-    Display the traversal path of the A* algorithm step by step, showing the graph after each node in the solution path is added.
-    """
-    import matplotlib.pyplot as plt
-    import networkx as nx
-    if closed_set is None:
-        closed_set = set()
-    snaps = []
-    for i in range(1, len(traversal)+1):
-        partial_path = traversal[:i]
-        G = nx.DiGraph()
-        all_nodes = set(parent.keys()) | set(parent.values())
-        all_nodes.discard(None)
-        for node in all_nodes:
-            G.add_node(node)
-        for child, par in parent.items():
-            if par is not None:
-                G.add_edge(par, child)
-        snap = {
-            'G': G.copy(),
-            'sol_path': partial_path.copy(),
-            'closed': closed_set.copy(),
-            'step': i-1
-        }
-        snaps.append(snap)
-
-    total = len(snaps)
-    cols = 3
-    rows = (total + cols - 1) // cols
-    plt.figure(figsize=(cols * 6, rows * 5), constrained_layout=True)
-
-    def tree_layout(G, root, width=1., gap=0.2, y=0, x=0.5):
-        pos = {root: (x, y)}
-        kids = list(G.successors(root))
-        if not kids:
-            return pos
-        dx = width / len(kids)
-        next_x = x - width / 2 - dx / 2
-        for kid in kids:
-            next_x += dx
-            pos.update(tree_layout(G, kid, width=dx, gap=gap, y=y - gap, x=next_x))
-        return pos
-
-    for i, snap in enumerate(snaps):
-        plt.subplot(rows, cols, i + 1)
-        G_snap = snap['G']
-        sol_path = snap['sol_path']
-        closed = snap['closed']
-        step = snap['step']
-        pos = tree_layout(G_snap, (0, 0))
-        node_colors = []
-        for n in G_snap.nodes():
-            if n in sol_path:
-                node_colors.append('lightgreen')
-            elif n in closed:
-                node_colors.append('lightgreen')
-            else:
-                node_colors.append('pink')
-        nx.draw(G_snap, pos, with_labels=True, node_color=node_colors,
-                node_size=700, font_size=8, edge_color='gray')
-        path_edges = list(zip(sol_path, sol_path[1:]))
-        nx.draw_networkx_edges(G_snap, pos, edgelist=path_edges,
-                               edge_color='black', width=2)
-        plt.title(f"A* Step {step+1}", fontsize=12)
-        plt.axis('off')
-    plt.suptitle("A* Water Jug Solution Path Step by Step", fontsize=16, y=1.02)
-    plt.savefig("19-08-25-01-astar-stepbystep.png")
-    plt.show()
-
-
-if __name__ == "__main__":
-    a = int(input("Enter capacity of Jug 1: "))
-    b = int(input("Enter capacity of Jug 2: "))
-    c = int(input("Enter the target amount: "))
-
-    solver = waterjug(a, b, c)
-    traversal = solver.astar(show_step_by_step=True)
-
-    print("\nA* traversal path:")
-    print(" -> ".join(str(state) for state in traversal))
-
-    # Show step-by-step traversal for A*
-    plot_astar_traversal(traversal, solver.parent)
+if __name__=="__main__":
+    print("Water Jug Problem - A* Search\n")
+    a=int(input("Enter level of water in Jug 1: "))
+    b=int(input("Enter level of water in Jug 2: "))
+    print("Enter start state (x,y):"); st=tuple(map(int,input().split(",")))
+    print("Enter goal state (x,y):"); gl=tuple(map(int,input().split(",")))
+    G,prev,gsc=astar(st,gl,(a,b)); final(G,prev,st,gl,gsc)
