@@ -73,21 +73,6 @@ class waterjug:
                 print("Expanded nodes so far:")
                 print(", ".join(str(n) for n in closed_set))
 
-            # Print/display at each new depth (optional, can keep or remove)
-            # if show_step_by_step and depth != last_depth:
-            #     last_depth = depth
-            #     # Reconstruct path to current node
-            #     traversal = []
-            #     curr = node
-            #     while curr is not None:
-            #         traversal.append(curr)
-            #         curr = self.parent[curr]
-            #     traversal.reverse()
-            #     print(f"\nTraversal at depth {depth}:")
-            #     print(" -> ".join(str(state) for state in traversal))
-            #     # Optionally, display the graph for this depth
-            #     # display(traversal, self.parent, closed_set.copy())
-
             # Check if target is reached in either jug
             if node[0] == self.target or node[1] == self.target:
                 # Reconstruct patha

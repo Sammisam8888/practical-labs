@@ -1,128 +1,213 @@
 import matplotlib.pyplot as plt
 import networkx as nx
-from networkx.drawing.nx_pydot import graphviz_layout
 
-# Normalize partition to avoid duplicates (sorted order)
-def normalize(state):
-    parts = list(map(int, state.split("+")))
-    parts.sort()
-    return "+".join(map(str, parts))
+class waterjug:
+    def __init__(self, jug1, jug2, target):
+        self.jug1 = jug1
+        self.jug2 = jug2
+        self.target = target
+        self.visited = set()
+        self.parent = {}
+        self.expansion_order = []  # Track the order of node expansion
+        
 
-# Expand node into partitions (skip equal halves)
-def expand_state(state):
-    parts = list(map(int, state.split("+")))
-    children = []
-    for i, p in enumerate(parts):
-        if p > 1:  # split p into two
-            for j in range(1, p):
-                if j == p - j:   # skip equal partitions
-                    continue
-                new_parts = parts[:i] + [j, p - j] + parts[i+1:]
-                new_parts.sort()
-                children.append("+".join(map(str, new_parts)))
-    return list(set(children))  # unique children
+    def check(self, x, y):
+        return 0 <= x <= self.jug1 and 0 <= y <= self.jug2
 
-# Build DAG instead of tree (shared children)
-def build_graph(start):
-    g = nx.DiGraph()
-    vis = set()
-    q = [normalize(start)]
-    while q:
-        current = q.pop(0)
-        if current in vis:
+    def getchildren(self, x, y):
+        states = []
+
+        # Fill Jug1
+        states.append((self.jug1, y))
+        # Fill Jug2
+        states.append((x, self.jug2))
+        # Empty Jug1
+        states.append((0, y))
+        # Empty Jug2
+        states.append((x, 0))
+        # Pour Jug1 -> Jug2
+        pour = min(x, self.jug2 - y)
+        states.append((x - pour, y + pour))
+        # Pour Jug2 -> Jug1
+        pour = min(y, self.jug1 - x)
+        states.append((x + pour, y - pour))
+
+        return [state for state in states if self.check(*state)]
+
+
+    def h(self, state):
+        x, y = state
+        if x > 0 and x<self.jug1 and y > 0 and y<self.jug2:
+            return 2
+        elif (x>0 and x<self.jug1) or (y>0 and y<self.jug2):
+            return 4
+        elif (x==0 and y==0) or (x==self.jug1 and y==self.jug2):
+            return 10
+        elif (x==0 and y==self.jug2) or ( x==self.jug1 and y==0):
+            return 8
+
+    def f(self, node,depth):
+        return depth+self.h(node)
+
+    def astar(self, show_step_by_step=False):
+        open_list = []  # [(state, depth, f)]
+        closed_set = set()
+        start = (0, 0)
+        open_list.append([start, 0, self.f(start, 0)])
+        self.parent = {start: None}
+        self.expansion_order = []  # Reset expansion order
+
+        last_depth = -1
+        while open_list:
+            # Sort by f value (lowest first)
+            open_list.sort(key=lambda x: x[2])
+            node, depth, f_val = open_list.pop(0)
+
+            if node in closed_set:
+                continue
+            closed_set.add(node)
+            self.expansion_order.append(node)  # Track expansion order
+
+            # Print/display at each step: show all expanded nodes so far
+            if show_step_by_step:
+                print(f"\nA* Step {len(closed_set)} (expanding node {node}):")
+                print("Expanded nodes so far:")
+                print(", ".join(str(n) for n in closed_set))
+
+            # Check if target is reached in either jug
+            if node[0] == self.target or node[1] == self.target:
+                # Reconstruct path
+                traversal = []
+                curr = node
+                while curr is not None:
+                    traversal.append(curr)
+                    curr = self.parent[curr]
+                traversal.reverse()
+                return traversal
+
+            for child in self.getchildren(*node):
+                if child not in closed_set and child not in [n[0] for n in open_list]:
+                    self.parent[child] = node
+                    open_list.append([child, depth + 1, self.f(child, depth + 1)])
+        # If no solution found
+        return []
+
+def plot_astar_traversal_progressive(traversal, parent, expansion_order):
+    """
+    Display the A* algorithm step by step, showing only nodes explored up to each step.
+    """
+    import matplotlib.pyplot as plt
+    import networkx as nx
+    
+    snaps = []
+    
+    # Create snapshots for each expansion step
+    for i in range(len(expansion_order)):
+        # Nodes explored up to this step
+        explored_so_far = set(expansion_order[:i+1])
+        
+        # Create graph with only explored nodes and their connections
+        G = nx.DiGraph()
+        
+        # Add nodes that have been explored so far
+        for node in explored_so_far:
+            G.add_node(node)
+        
+        # Add edges between explored nodes
+        for child, par in parent.items():
+            if par is not None and child in explored_so_far and par in explored_so_far:
+                G.add_edge(par, child)
+        
+        # Find solution path up to current node if it exists
+        current_node = expansion_order[i]
+        partial_solution = []
+        if current_node in traversal:
+            # Get path from start to current node
+            sol_index = traversal.index(current_node)
+            partial_solution = traversal[:sol_index+1]
+        
+        snap = {
+            'G': G.copy(),
+            'explored': explored_so_far.copy(),
+            'solution_path': partial_solution.copy(),
+            'current_node': current_node,
+            'step': i+1
+        }
+        snaps.append(snap)
+
+    total = len(snaps)
+    cols = 3
+    rows = (total + cols - 1) // cols
+    plt.figure(figsize=(cols * 6, rows * 5), constrained_layout=True)
+
+    def tree_layout(G, root, width=1., gap=0.2, y=0, x=0.5):
+        if root not in G.nodes():
+            return {}
+        pos = {root: (x, y)}
+        kids = list(G.successors(root))
+        if not kids:
+            return pos
+        dx = width / len(kids) if len(kids) > 0 else width
+        next_x = x - width / 2 + dx / 2
+        for kid in kids:
+            pos.update(tree_layout(G, kid, width=dx, gap=gap, y=y - gap, x=next_x))
+            next_x += dx
+        return pos
+
+    for i, snap in enumerate(snaps):
+        plt.subplot(rows, cols, i + 1)
+        G_snap = snap['G']
+        explored = snap['explored']
+        solution_path = snap['solution_path']
+        current_node = snap['current_node']
+        step = snap['step']
+        
+        if len(G_snap.nodes()) == 0:
             continue
-        vis.add(current)
-        for child in expand_state(current):
-            child = normalize(child)
-            g.add_edge(current, child)
-            if child not in vis:
-                q.append(child)
-    return g
-
-# Compute depth of each node (BFS)
-def compute_levels(g, root):
-    levels = {root: 0}
-    q = [root]
-    while q:
-        current = q.pop(0)
-        for child in g.successors(current):
-            if child not in levels:
-                levels[child] = levels[current] + 1
-                q.append(child)
-    return levels
-
-# Minimax with terminal distinction (true terminal = -1, dead-end = +1)
-def minimax(g, node, maximizing, memo, levels, max_depth):
-    if node in memo:
-        return memo[node]
-
-    children = list(g.successors(node))
-
-    if not children:  # terminal
-        if levels[node] == max_depth:
-            val = -1   # true terminal
-        else:
-            val = +1   # dead-end branch
-        memo[node] = val
-        return val
-
-    vals = [minimax(g, c, not maximizing, memo, levels, max_depth) for c in children]
-    val = max(vals) if maximizing else min(vals)
-    memo[node] = val
-    return val
-
-# Draw graph up to a given level with dashed level lines & right labels
-def draw_graph_upto_level(g, memo, levels, max_level, pos):
-    plt.figure(figsize=(14, 10))
-    nodes = [n for n, lvl in levels.items() if lvl <= max_level]
-    edges = [(u, v) for u, v in g.edges if levels[u] <= max_level and levels[v] <= max_level]
-
-    labels = {node: f"{node}\n{memo.get(node, '')}" for node in nodes}
-    nx.draw(g, pos, with_labels=False, nodelist=nodes, edgelist=edges,
-            node_color='lightblue', node_size=1800, arrows=True)
-    nx.draw_networkx_labels(g, pos, labels, font_size=7)
-
-    # dashed horizontal lines + right labels
-    level_to_nodes = {lvl: [] for lvl in range(max_level + 1)}
-    for node, lvl in levels.items():
-        if lvl <= max_level:
-            level_to_nodes[lvl].append(node)
-
-    for lvl, nodes_at in level_to_nodes.items():
-        if not nodes_at:
-            continue
-        ys = [pos[n][1] for n in nodes_at]
-        xs = [pos[n][0] for n in nodes_at]
-        y = sum(ys) / len(ys)
-        xmin, xmax = min(xs), max(xs)
-        plt.hlines(y, xmin - 100, xmax + 100, linestyles="dashed", colors="gray")
-        role = "MIN" if lvl % 2 == 0 else "MAX"
-        plt.text(xmax + 120, y, f"{role} level {lvl}",
-                 fontsize=10, ha="left", va="center", color="red", fontweight="bold")
-
-    plt.title(f"Minimax Partition Graph up to Level {max_level}")
+            
+        pos = tree_layout(G_snap, (0, 0))
+        
+        # Color nodes based on their status
+        node_colors = []
+        for n in G_snap.nodes():
+            if n == current_node:
+                node_colors.append('lightblue')  # Currently expanding node
+            elif n in solution_path:
+                node_colors.append('lightgreen')  # Part of solution path
+            else:
+                node_colors.append('lightcoral')  # Explored but not in solution
+        
+        # Draw the graph
+        nx.draw(G_snap, pos, with_labels=True, node_color=node_colors,
+                node_size=700, font_size=8, edge_color='gray')
+        
+        # Highlight solution path edges if they exist
+        if len(solution_path) > 1:
+            path_edges = list(zip(solution_path, solution_path[1:]))
+            # Only draw edges that exist in current graph
+            valid_path_edges = [(u, v) for u, v in path_edges if G_snap.has_edge(u, v)]
+            if valid_path_edges:
+                nx.draw_networkx_edges(G_snap, pos, edgelist=valid_path_edges,
+                                       edge_color='green', width=3)
+        
+        plt.title(f"A* Step {step} - Expanding {current_node}", fontsize=12)
+        plt.axis('off')
+    
+    plt.suptitle("A* Water Jug Solution - Progressive Exploration", fontsize=16, y=1.02)
+    plt.savefig("astar-progressive-exploration.png", dpi=300, bbox_inches='tight')
     plt.show()
 
+
 if __name__ == "__main__":
-    print("Minimax Partition Graph (Unique States)\n")
-    n = int(input("Enter a number (e.g., 9): "))
-    start = str(n)
+    a = int(input("Enter capacity of Jug 1: "))
+    b = int(input("Enter capacity of Jug 2: "))
+    c = int(input("Enter the target amount: "))
 
-    g = build_graph(start)
-    root = normalize(start)
-    levels = compute_levels(g, root)
-    max_depth = max(levels.values())
+    solver = waterjug(a, b, c)
+    traversal = solver.astar(show_step_by_step=True)
 
-    memo = {}
-    # even levels = MIN, so root is MIN -> maximizing=False
-    root_val = minimax(g, root, False, memo, levels, max_depth)
+    print("\nA* traversal path:")
+    print(" -> ".join(str(state) for state in traversal))
 
-    print("Root minimax value:", root_val)
-    print("\nNode values:")
-    for node, val in memo.items():
-        role = "MIN" if levels[node] % 2 == 0 else "MAX"
-        print(f"{node} ({role}) -> {val}")
-
-    pos = graphviz_layout(g, prog='dot')
-    for d in range(max_depth + 1):
-        draw_graph_upto_level(g, memo, levels, d, pos)
+    # Show progressive step-by-step exploration
+    plot_astar_traversal_progressive(traversal, solver.parent, solver.expansion_order)
