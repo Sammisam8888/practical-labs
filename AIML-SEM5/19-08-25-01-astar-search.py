@@ -37,8 +37,8 @@ def astar(st,gl,lvl):
 def draw(G,prev,st,gl,gsc,d,cur):
     pos=graphviz_layout(G,prog='dot'); plt.figure(figsize=(10,7))
     lbls={n:f"{n}\nh={h(n,gl)}" for n in G.nodes()}
-    nx.draw(G,pos,labels=lbls,with_labels=True,node_color='lightyellow',node_size=700,font_size=8)
-    nx.draw_networkx_edge_labels(G,pos,edge_labels={(u,v):gsc[v] for u,v in G.edges()},font_size=7)
+    nx.draw(G,pos,labels=lbls,with_labels=True,node_color='lightpink',node_size=2000,font_size=16)
+    nx.draw_networkx_edge_labels(G,pos,edge_labels={(u,v):gsc[v] for u,v in G.edges()},font_size=16)
 
     if cur in prev:
         p=[]; t=cur
@@ -46,15 +46,15 @@ def draw(G,prev,st,gl,gsc,d,cur):
         p.reverse(); e=[(p[i],p[i+1]) for i in range(len(p)-1)]
         nx.draw_networkx_edges(G,pos,edgelist=e,edge_color='green',width=3)
 
-    nx.draw_networkx_nodes(G,pos,nodelist=[st],node_color='lightblue',node_size=800)
-    if gl in G.nodes(): nx.draw_networkx_nodes(G,pos,nodelist=[gl],node_color='lightcoral',node_size=800)
+    nx.draw_networkx_nodes(G,pos,nodelist=[st],node_color='lightblue',node_size=3000)
+    if gl in G.nodes(): nx.draw_networkx_nodes(G,pos,nodelist=[gl],node_color='lightcoral',node_size=3000)
     plt.title(f"A* Search - Depth {d}"); plt.show()
 
 def final(G,prev,st,gl,gsc):
     pos=graphviz_layout(G,prog='dot'); plt.figure(figsize=(12,9))
     lbls={n:f"{n}\nh={h(n,gl)}" for n in G.nodes()}
-    nx.draw(G,pos,labels=lbls,with_labels=True,node_color='orange',node_size=700,font_size=8)
-    nx.draw_networkx_edge_labels(G,pos,edge_labels={(u,v):gsc[v] for u,v in G.edges()},font_size=7)
+    nx.draw(G,pos,labels=lbls,with_labels=True,node_color='orange',node_size=2000,font_size=16)
+    nx.draw_networkx_edge_labels(G,pos,edge_labels={(u,v):gsc[v] for u,v in G.edges()},font_size=16)
 
     if gl in prev:
         p=[]; t=gl
@@ -63,14 +63,17 @@ def final(G,prev,st,gl,gsc):
         nx.draw_networkx_edges(G,pos,edgelist=e,edge_color='green',width=3)
         print("Final Path:", " -> ".join(map(str,p)))
 
-    nx.draw_networkx_nodes(G,pos,nodelist=[st],node_color='lightblue',node_size=800)
-    if gl in G.nodes(): nx.draw_networkx_nodes(G,pos,nodelist=[gl],node_color='lightcoral',node_size=800)
-    plt.title("Final A* Path"); plt.show()
+    nx.draw_networkx_nodes(G,pos,nodelist=[st],node_color='lightblue',node_size=3000)
+    if gl in G.nodes(): nx.draw_networkx_nodes(G,pos,nodelist=[gl],node_color='lightcoral',node_size=3000)
+    plt.title("Final A* Path"); 
+    plt.savefig("19-08-25-01-astar-search.png")
+    plt.show()
+
 
 if __name__=="__main__":
     print("Water Jug Problem - A* Search\n")
     a=int(input("Enter level of water in Jug 1: "))
     b=int(input("Enter level of water in Jug 2: "))
-    print("Enter start state (x,y):"); st=tuple(map(int,input().split(",")))
-    print("Enter goal state (x,y):"); gl=tuple(map(int,input().split(",")))
+    t=int(input("Enter target level:")); 
+    gl=(t,0); st=(0,0)
     G,prev,gsc=astar(st,gl,(a,b)); final(G,prev,st,gl,gsc)
