@@ -6,47 +6,37 @@ void swap(int *a, int *b) {
     *b = temp;
 }
 
-void sortbyarrival(int n, int* at, int* bt, int* pid) {
-    for (int i = 0; i < n - 1; i++) {
-        for (int j = i + 1; j < n; j++) {
-            if (at[j] < at[i]) {
-                swap(&at[i], &at[j]);
-                swap(&bt[i], &bt[j]);
-                swap(&pid[i], &pid[j]); 
-            }
-        }
-    }
-}
+// Rate Monotonic Scheduling
+void rateMonotonic(int n, int *pid, int *et, int *pt, int hyperPeriod) {
+    int time = 0;
+    int remaining[n], nextArrival[n], ct[n], wt[n], tat[n];
+    int completed[n];
 
-void sjfpremptive(int n, int *pid, int* at, int* bt, double* sjftask) {
-    int completed = 0, time = 0;
-    int ct[n], wt[n], tat[n], btr[n];
-    for (int i = 0; i < n; i++) btr[i] = bt[i];
+    for (int i = 0; i < n; i++) {
+        remaining[i] = et[i];
+        nextArrival[i] = 0;
+        completed[i] = 0;
+    }
 
     int wtsum = 0, tatsum = 0;
 
-
-    // For Gantt chart
     printf("\nGantt Chart:\n");
-    int prev = -1; // track previous running process
+    int prev = -1;
 
-    while (completed < n) {
-        int j = -1, minbtr = 1e9;
+    while (time < hyperPeriod) {
+        int j = -1, minPeriod = 1e9;
 
         for (int i = 0; i < n; i++) {
-            if (at[i] <= time && btr[i] > 0) {
-                if (btr[i] < minbtr) {
-                    minbtr = btr[i];
-                    j = i;
-                } else if (btr[i] == minbtr && at[i] < at[j]) {
+            if (time >= nextArrival[i] && remaining[i] > 0) {
+                if (pt[i] < minPeriod) {
+                    minPeriod = pt[i];
                     j = i;
                 }
             }
         }
 
         if (j == -1) {
-            // CPU idle
-            if (prev != -2) { // print "Idle" only once continuously
+            if (prev != -2) {
                 printf("| %d Idle ", time);
                 prev = -2;
             }
@@ -54,55 +44,64 @@ void sjfpremptive(int n, int *pid, int* at, int* bt, double* sjftask) {
             continue;
         }
 
-        // Context switch detection
         if (prev != j) {
             printf("| %d P%d ", time, pid[j]);
             prev = j;
         }
 
-        btr[j]--;
+        remaining[j]--;
         time++;
 
-        if (btr[j] == 0) {
-            completed++;
+        if (remaining[j] == 0) {
+            completed[j]++;
             ct[j] = time;
-            tat[j] = ct[j] - at[j];
-            wt[j] = tat[j] - bt[j];
+            tat[j] = ct[j] - (nextArrival[j]);
+            wt[j] = tat[j] - et[j];
             wtsum += wt[j];
             tatsum += tat[j];
 
-            printf("%d", time); // print end time when process finishes
+            nextArrival[j] += pt[j]; 
+            remaining[j] = et[j];    
         }
     }
+    printf("| %d |\n", time);
 
-    printf("|\n\n");
-    printf("Task    Arrival Time   Burst Time   Waiting Time   Completion Time   Turnaround Time \n");
-
-    // Table of processes
+    printf("\nTask    ExecTime   Period   Waiting Time   Completion Time   Turnaround Time\n");
     for (int i = 0; i < n; i++) {
-        printf(" P%-6d %-13d %-12d %-14d %-17d %-15d\n",
-               pid[i], at[i], bt[i], wt[i], ct[i], tat[i]);
+        printf(" P%-6d %-10d %-8d %-14d %-17d %-15d\n",
+               pid[i], et[i], pt[i], wt[i], ct[i], tat[i]);
     }
 
-    sjftask[0] = (double)wtsum / n;
-    sjftask[1] = (double)tatsum / n;
+    printf("Average Waiting Time: %.2f\n", (double)wtsum / n);
+    printf("Average Turnaround Time: %.2f\n", (double)tatsum / n);
+}
+
+int gcd(int a, int b) {
+    return (b == 0) ? a : gcd(b, a % b);
+}
+
+int lcm(int a, int b) {
+    return (a * b) / gcd(a, b);
 }
 
 int main() {
     int n;
-    printf("Enter the number of processes: ");
+    printf("Enter number of processes: ");
     scanf("%d", &n);
 
-    printf("Enter the arrival time, burst time of processes: \n");
-    int at[n], bt[n], pid[n];
+    int pid[n], et[n], pt[n];
     for (int i = 0; i < n; i++) {
-        printf("Process %d: ", i + 1);
-        scanf("%d %d", &at[i], &bt[i]);
-        pid[i] = i + 1; 
+        printf("Process %d (ExecTime Period): ", i + 1);
+        scanf("%d %d", &et[i], &pt[i]);
+        pid[i] = i + 1;
     }
-    sortbyarrival(n, at, bt, pid);
-    double sjftask[2];
-    sjfpremptive(n, pid, at, bt, sjftask);
-    printf("Average Waiting Time: %.2f\nAverage Turnaround Time: %.2f\n", sjftask[0], sjftask[1]);
+
+    // Calculate hyper-period (LCM of periods)
+    int hyperPeriod = pt[0];
+    for (int i = 1; i < n; i++) {
+        hyperPeriod = lcm(hyperPeriod, pt[i]);
+    }
+
+    rateMonotonic(n, pid, et, pt, hyperPeriod);
     return 0;
 }
