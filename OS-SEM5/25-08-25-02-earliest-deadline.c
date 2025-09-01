@@ -73,7 +73,7 @@ void edfscheduling(int n, int *pid, int* at, int* bt, int* dl, double* edftask) 
     }
 
     printf("|\n\n");
-    printf("Task    Arrival Time   Burst Time   Deadline   Waiting Time   Completion Time   Turnaround Time \n");
+    printf("Task    Arrival Time   Burst Time   Deadline  Waiting Time   Completion Time   Turnaround Time \n");
 
     for (int i = 0; i < n; i++) {
         printf(" P%-6d %-13d %-12d %-9d %-14d %-17d %-15d\n",
