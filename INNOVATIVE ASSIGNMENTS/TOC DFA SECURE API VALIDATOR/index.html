@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>API Route Security Analyzer</title>
+    <!--
+      This simple static site implements a deterministic finite automaton (DFA)
+      based security analysis for API endpoints.  A user can enter an API
+      route, choose an HTTP method and optionally supply a sample JSON
+      payload.  When the form is submitted the client‑side JavaScript
+      constructs a sequence of DFA states representing the high‑level
+      security checks that should be performed for that endpoint.  A state
+      diagram, state table and a list of recommended security practices are
+      rendered directly in the browser.
+    -->
+    <link rel="stylesheet" href="style.css" />
+    <!-- Load the Mermaid module for rendering state diagrams.  Using a CDN
+         means the entire application remains serverless and can be hosted as
+         static files on Render or any other provider. -->
+    <script type="module">
+      import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+      window.mermaid = mermaid;
+      // Do not render diagrams on load – diagrams are generated on demand.
+      mermaid.initialize({ startOnLoad: false });
+    </script>
+  </head>
+  <body>
+    <header>
+      <h1>API Route Security Analyzer</h1>
+      <p>
+        Explore how your API endpoint is validated using a deterministic
+        finite automaton. Enter a route and the tool will illustrate the
+        security checks, recommended best practices and the corresponding
+        state transitions.
+      </p>
+    </header>
+    <main>
+      <form id="apiForm">
+        <div class="form-group">
+          <label for="path">API Endpoint <span class="required">*</span></label>
+          <input
+            id="path"
+            type="text"
+            placeholder="/api/users/{id}"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="method">HTTP Method</label>
+          <select id="method">
+            <option value="GET">GET</option>
+            <option value="POST">POST</option>
+            <option value="PUT">PUT</option>
+            <option value="PATCH">PATCH</option>
+            <option value="DELETE">DELETE</option>
+            <option value="OPTIONS">OPTIONS</option>
+            <option value="HEAD">HEAD</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="body">Sample Request Payload (JSON)</label>
+          <textarea
+            id="body"
+            rows="5"
+            placeholder="{ \"name\": \"John Doe\", \"email\": \"john@example.com\" }"
+          ></textarea>
+        </div>
+        <button type="submit">Analyze</button>
+      </form>
+
+      <!-- Results section hidden by default until the user submits the form -->
+      <section id="result" class="hidden">
+        <h2>Security Analysis</h2>
+        <div id="analysisOutput"></div>
+        <h3>State Diagram</h3>
+        <div id="diagramArea" class="diagram"></div>
+        <h3>State Table</h3>
+        <div class="table-container">
+          <table id="stateTable"></table>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <p>
+        Built with HTML, CSS and JavaScript.  No backend services are
+        required – everything runs in your browser.
+      </p>
+    </footer>
+    <script src="script.js" defer></script>
+  </body>
+</html>

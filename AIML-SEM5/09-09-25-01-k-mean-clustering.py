@@ -1,308 +1,114 @@
-# kmeans_visual_steps_improved.py
-import math
-import networkx as nx
-import matplotlib.pyplot as plt
-import numpy as np
+"""
+Algorithm K-Mean-Clustering
+input - dataset D with n no of tuples
+output - k no of clusters
 
-def parse_input_points(s):
-    try:
-        parts = s.strip().split()
-        return [float(p) for p in parts]
-    except:
-        raise ValueError("Enter space separated numeric values for data points.")
+BEGIN
+    Arbitrarily choose K objects from D as initial cluster means
+    repeat
+        Assign each tuple in D to its closest cluster
+            (distance = |x - mean_of_cluster|)
+        Update the cluster means i.e. calculate the mean of each cluster
+    until no change in cluster assignment
+END
 
-def initialize_centroids(data, k, provided=None):
-    if provided:
-        if len(provided) != k:
-            raise ValueError("Number of provided centroids must equal k.")
-        return [float(c) for c in provided]
-    # default: choose first k distinct values (or random if not enough)
-    uniq = []
-    for x in data:
-        if x not in uniq:
-            uniq.append(x)
-            if len(uniq) == k:
-                break
-    if len(uniq) < k:
-        # fallback: extend by random picks
-        import random
-        while len(uniq) < k:
-            uniq.append(random.choice(data))
-    return [float(x) for x in uniq[:k]]
+Dry Run:
+Let D = {5, 12, 7, 4, 3, 11, 19, 25, 13, 14}
+Here K = 2 (two clusters)
+Let initial centroids be C1 = 5, C2 = 12
 
-def assign_points(data, centroids):
-    assignments = []
-    distances = []
-    for x in data:
-        dists = [abs(x - c) for c in centroids]
-        cluster = int(min(range(len(dists)), key=lambda i: dists[i]))
-        assignments.append(cluster)
-        distances.append(dists)
-    return assignments, distances
+Iteration 1:
+D    DC1   DC2   Cluster
+5    0     7     C1
+12   7     0     C2
+7    2     5     C1
+4    1     8     C1
+3    2     9     C1
+11   6     1     C2
+19   14    7     C2
+25   20    13    C2
+13   8     1     C2
+14   9     2     C2
 
-def update_centroids(data, assignments, k, old_centroids):
-    new_centroids = []
-    for j in range(k):
-        cluster_points = [x for x, a in zip(data, assignments) if a == j]
-        if cluster_points:
-            new_centroids.append(sum(cluster_points) / len(cluster_points))
-        else:
-            # empty cluster: keep old centroid (common strategy) 
-            new_centroids.append(old_centroids[j])
-    return new_centroids
+C1 = {5, 7, 4, 3} → mean = (5+7+4+3)/4 = 4.75
+C2 = {12, 11, 19, 25, 13, 14} → mean = (12+11+19+25+13+14)/6 = 15.67
 
-def kmeans_1d(data, k, init_centroids=None, max_iter=100, tol=1e-6):
-    centroids = initialize_centroids(data, k, init_centroids)
-    history = []
-    for it in range(1, max_iter+1):
-        assignments, distances = assign_points(data, centroids)
-        new_centroids = update_centroids(data, assignments, k, centroids)
+Iteration 2:
+D    DC1     DC2     Cluster
+5    0.25    10.67   C1
+12   7.25    3.67    C2
+7    2.25    8.67    C1
+4    0.75    11.67   C1
+3    1.75    12.67   C1
+11   6.25    4.67    C2
+19   14.25   3.33    C2
+25   20.25   9.33    C2
+13   8.25    2.67    C2
+14   9.25    1.67    C2
 
-        # record iteration snapshot
-        snapshot = {
-            "iter": it,
-            "centroids": centroids[:],
-            "assignments": assignments[:],
-            "distances": distances[:]  # list of lists
-        }
-        history.append(snapshot)
+C1 = {5, 7, 4, 3} → mean = 4.75  (no change)
+C2 = {12, 11, 19, 25, 13, 14} → mean = 15.67 (no change)
 
-        # check convergence: assignments stable OR centroids moved little
-        if new_centroids == centroids:
-            break
-        if all(abs(nc - c) <= tol for nc, c in zip(new_centroids, centroids)):
-            centroids = new_centroids
-            break
-        centroids = new_centroids
+Since there is no change in clusters → STOP
 
-    # final snapshot of converged centroids (optional print)
-    final_assignments, final_distances = assign_points(data, centroids)
-    history.append({
-        "iter": len(history)+1,
-        "centroids": centroids[:],
-        "assignments": final_assignments[:],
-        "distances": final_distances[:]
-    })
-    return history
-
-# ---------- Improved Visualization helper ----------
-def draw_kmeans_history(data, history, filename="kmeans_steps_improved.png"):
-    n_steps = len(history)
-    # layout grid
-    cols = 2 if n_steps > 1 else 1
-    rows = math.ceil(n_steps / cols)
-    fig, axes = plt.subplots(rows, cols, figsize=(cols*10, rows*6))
-    if not isinstance(axes, (list, tuple, np.ndarray)):
-        axes = [axes]
-    axes = (axes.flatten() if hasattr(axes, "flatten") else axes)
-
-    # Improved color schemes with better visibility
-    cluster_colors = ['#FFE5E5', '#E5FFE5', '#E5E5FF', '#FFFFE5', '#FFE5FF', '#E5FFFF']  # Light pastel colors
-    edge_colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD']    # Darker edge colors
-    
-    for idx, snap in enumerate(history):
-        ax = axes[idx]
-        centroids = snap["centroids"]
-        assignments = snap["assignments"]
-        distances = snap["distances"]
-        k = len(centroids)
-
-        # Build networkx graph: point nodes p0..pn-1, centroids C0..Ck-1
-        G = nx.DiGraph()
-        n = len(data)
-        # node names
-        p_nodes = [f"p{i}" for i in range(n)]
-        c_nodes = [f"C{j}" for j in range(k)]
-        # add nodes
-        for i, pn in enumerate(p_nodes):
-            G.add_node(pn)
-        for j, cn in enumerate(c_nodes):
-            G.add_node(cn)
-
-        # add edges from point to its assigned centroid
-        edge_labels = {}
-        for i, pn in enumerate(p_nodes):
-            assigned = assignments[i]
-            cn = c_nodes[assigned]
-            G.add_edge(pn, cn)
-            edge_labels[(pn, cn)] = f"{distances[i][assigned]:.2f}"
-
-        # Improved positioning with NO overlapping
-        pos = {}
-        
-        # Calculate proper spacing to avoid overlaps
-        minx, maxx = min(data), max(data)
-        data_range = maxx - minx if maxx != minx else 10.0
-        
-        # Create a layout that spreads all points horizontally to avoid overlaps
-        sorted_indices = sorted(range(len(data)), key=lambda i: data[i])
-        
-        # Calculate minimum spacing needed (based on node size)
-        min_spacing = max(1.0, data_range / max(8, len(data)))  # Ensure minimum spacing
-        
-        # Position points with guaranteed no overlap
-        used_positions = set()
-        for idx, i in enumerate(sorted_indices):
-            x_value = data[i]
-            
-            # Find a free position near the actual value
-            base_x = x_value
-            offset = 0
-            step = min_spacing / 2
-            
-            # Try positions around the actual value until we find a free spot
-            while True:
-                test_x = base_x + offset
-                # Check if this position is far enough from all used positions
-                if not any(abs(test_x - used_x) < min_spacing for used_x in used_positions):
-                    pos[f"p{i}"] = (test_x, 0.0)
-                    used_positions.add(test_x)
-                    break
-                
-                # Alternate between positive and negative offsets
-                if offset <= 0:
-                    offset = -offset + step
-                else:
-                    offset = -offset
-        
-        # Position centroids higher up with more spacing
-        for j, c in enumerate(centroids):
-            pos[f"C{j}"] = (c, 2.0)
-
-        # Set background color
-        ax.set_facecolor('#F8F9FA')
-        
-        # Draw nodes with improved colors and spacing
-        node_colors = []
-        node_edge_colors = []
-        for i in range(len(data)):
-            cluster_idx = assignments[i] % len(cluster_colors)
-            node_colors.append(cluster_colors[cluster_idx])
-            node_edge_colors.append(edge_colors[cluster_idx])
-        
-        # Centroid colors
-        centroid_colors = [cluster_colors[j % len(cluster_colors)] for j in range(k)]
-        centroid_edge_colors = [edge_colors[j % len(edge_colors)] for j in range(k)]
-
-        # Draw points with better visibility
-        nx.draw_networkx_nodes(G, pos,
-                               nodelist=p_nodes,
-                               node_color=node_colors,
-                               edgecolors=node_edge_colors,
-                               linewidths=2,
-                               node_size=800,
-                               ax=ax)
-        
-        # Draw centroids (bigger, square shape)
-        nx.draw_networkx_nodes(G, pos,
-                               nodelist=c_nodes,
-                               node_color=centroid_colors,
-                               edgecolors=centroid_edge_colors,
-                               linewidths=3,
-                               node_shape="s",
-                               node_size=1200,
-                               ax=ax)
-
-        # Improved labels with better formatting
-        p_labels = {f"p{i}": f"{data[i]:.1f}" for i in range(len(data))}
-        c_labels = {f"C{j}": f"C{j}\n{centroids[j]:.2f}" for j in range(k)}
-        labels = {**p_labels, **c_labels}
-        
-        # Draw labels with better contrast
-        nx.draw_networkx_labels(G, pos, labels=labels, 
-                               font_size=10, font_weight='bold',
-                               font_color='black', ax=ax)
-
-        # Draw edges with better visibility
-        edge_list = list(G.edges())
-        edge_colors_for_edges = []
-        for edge in edge_list:
-            point_idx = int(edge[0][1:])  # Extract point index from 'p0', 'p1', etc.
-            cluster_idx = assignments[point_idx] % len(edge_colors)
-            edge_colors_for_edges.append(edge_colors[cluster_idx])
-        
-        nx.draw_networkx_edges(G, pos, 
-                              edgelist=edge_list,
-                              edge_color=edge_colors_for_edges,
-                              arrows=False, 
-                              width=2,
-                              alpha=0.7,
-                              ax=ax)
-        
-        # Draw edge labels with corrected positioning
-        nx.draw_networkx_edge_labels(G, pos, 
-                                    edge_labels=edge_labels, 
-                                    font_size=9, 
-                                    font_weight='bold',
-                                    bbox=dict(boxstyle="round,pad=0.1", 
-                                             facecolor='white', 
-                                             edgecolor='gray',
-                                             alpha=0.8),
-                                    ax=ax)
-
-        # Improved aesthetics
-        ax.set_title(f"K-means Step {snap['iter']}\nCentroids: {', '.join(f'{c:.3f}' for c in centroids)}", 
-                    fontsize=14, fontweight='bold', pad=20)
-        
-        # Better axis limits with more padding to accommodate spread-out points
-        all_x_positions = [pos[f"p{i}"][0] for i in range(len(data))]
-        x_min, x_max = min(all_x_positions), max(all_x_positions)
-        x_range = x_max - x_min if x_max != x_min else 2.0
-        ax.set_xlim(x_min - 0.3 * x_range, x_max + 0.3 * x_range)
-        ax.set_ylim(-0.7, 2.7)
-        
-        # Remove y-axis ticks and add grid for better readability
-        ax.set_yticks([])
-        ax.grid(True, alpha=0.3, linestyle='--')
-        ax.set_xlabel('Data Values (spread to avoid overlap)', fontweight='bold', fontsize=11)
-        
-        # Add a subtle border
-        for spine in ax.spines.values():
-            spine.set_edgecolor('#CCCCCC')
-            spine.set_linewidth(1.5)
-
-    # Hide unused subplots
-    for j in range(len(history), len(axes)):
-        if j < len(axes):
-            fig.delaxes(axes[j])
-
-    plt.tight_layout(pad=2.0)
-    plt.savefig(filename, dpi=300, bbox_inches='tight')
-    print(f"Saved improved visualization as {filename}")
-    plt.show()
-
-# ---------- Main interactive section ----------
-if __name__ == "__main__":
+Final Clusters:
+C1 = {5, 7, 4, 3}
+C2 = {12, 11, 19, 25, 13, 14}
+"""
+import matplotlib.pyplot as plt,networkx as nx,math,random,numpy as np
+def p(s):return [float(x) for x in s.strip().split()]
+def i(d,k,c=None):
+    if c:return [float(x) for x in c]
+    u=[];[u.append(x) for x in d if x not in u];[u.append(random.choice(d)) for _ in range(k-len(u))];return [float(x) for x in u[:k]]
+def a(d,c):
+    r=[];dist=[];[r.append(min(range(len(c)),key=lambda i:abs(x-c[i]))) or dist.append([abs(x-v) for v in c]) for x in d];return r,dist
+def u(d,r,k,o):
+    return [sum([x for x,a in zip(d,r) if a==j])/len([x for x,a in zip(d,r) if a==j]) if [x for x,a in zip(d,r) if a==j] else o[j] for j in range(k)]
+def kmeans(d,k,c0=None,m=100,tol=1e-6):
+    c=i(d,k,c0);h=[]
+    for it in range(1,m+1):
+        r,dist=a(d,c);n=u(d,r,k,c)
+        h.append({"iter":it,"c":c[:],"r":r[:],"dist":dist[:]})
+        if n==c or all(abs(nc-cx)<=tol for nc,cx in zip(n,c)):c=n;break
+        c=n
+    r,dist=a(d,c)
+    h.append({"iter":len(h)+1,"c":c[:],"r":r[:],"dist":dist[:]})
+    return h
+def v(d,h):
+    n=len(h);cols=2 if n>1 else 1;rows=math.ceil(n/cols);fig,ax=plt.subplots(rows,cols,figsize=(cols*10,rows*6));ax=ax.flatten() if hasattr(ax,"flatten") else [ax]
+    cc=['#FFE5E5','#E5FFE5','#E5E5FF','#FFFFE5','#FFE5FF','#E5FFFF'];ec=['#FF6B6B','#4ECDC4','#45B7D1','#96CEB4','#FFEAA7','#DDA0DD']
+    for idx,snap in enumerate(h):
+        a0=ax[idx];c=snap["c"];r=snap["r"];dist=snap["dist"];k=len(c);G=nx.DiGraph()
+        p_nodes=[f"p{i}" for i in range(len(d))];c_nodes=[f"C{j}" for j in range(k)]
+        [G.add_node(nm) for nm in p_nodes+c_nodes];el={};[G.add_edge(p_nodes[i],c_nodes[r[i]]) or el.update({(p_nodes[i],c_nodes[r[i]]):f"{dist[i][r[i]]:.2f}"}) for i in range(len(d))]
+        pos={};srt=sorted(range(len(d)),key=lambda i:d[i]);used=set();rng=max(d)-min(d) if max(d)!=min(d) else 10
+        for ii,idx2 in enumerate(srt):
+            x=d[idx2];o=0;step=max(1,rng/max(8,len(d)))/2
+            while any(abs(x+o-u)<step*2 for u in used):o=-o+step if o<=0 else -o
+            pos[p_nodes[idx2]]=(x+o,0);used.add(x+o)
+        for j,ccen in enumerate(c):pos[c_nodes[j]]=(ccen,2)
+        a0.set_facecolor('#F8F9FA')
+        nx.draw_networkx_nodes(G,pos,nodelist=p_nodes,node_color=[cc[r[i]%len(cc)] for i in range(len(d))],edgecolors=[ec[r[i]%len(ec)] for i in range(len(d))],linewidths=2,node_size=800,ax=a0)
+        nx.draw_networkx_nodes(G,pos,nodelist=c_nodes,node_color=[cc[j%len(cc)] for j in range(k)],edgecolors=[ec[j%len(ec)] for j in range(k)],linewidths=3,node_shape='s',node_size=1200,ax=a0)
+        nx.draw_networkx_labels(G,pos,{**{p_nodes[i]:f"{d[i]:.1f}" for i in range(len(d))},**{c_nodes[j]:f"C{j}\n{c[j]:.2f}" for j in range(k)}},font_size=10,font_weight='bold',font_color='black',ax=a0)
+        nx.draw_networkx_edges(G,pos,edgelist=list(G.edges()),edge_color=[ec[r[int(e[0][1:])%len(ec)] for e in G.edges()],arrows=False,width=2,alpha=0.7,ax=a0)
+        nx.draw_networkx_edge_labels(G,pos,edge_labels=el,font_size=9,font_weight='bold',bbox=dict(boxstyle="round,pad=0.1",facecolor='white',edgecolor='gray',alpha=0.8),ax=a0)
+        a0.set_title(f"K-means Step {snap['iter']}\nCentroids: {', '.join(f'{x:.2f}' for x in c)}",fontsize=14,fontweight='bold',pad=20)
+        xvals=[pos[p][0] for p in p_nodes];xr=max(xvals)-min(xvals) if max(xvals)!=min(xvals) else 2;a0.set_xlim(min(xvals)-0.3*xr,max(xvals)+0.3*xr);a0.set_ylim(-0.7,2.7);a0.set_yticks([]);a0.grid(True,alpha=0.3,linestyle='--');a0.set_xlabel('Data Values (spread to avoid overlap)',fontweight='bold',fontsize=11);[sp.set_edgecolor('#CCCCCC');sp.set_linewidth(1.5) for sp in a0.spines.values()]
+    for j in range(len(h),len(ax)):fig.delaxes(ax[j])
+    plt.tight_layout(pad=2);plt.show()
+if __name__=="__main__":
     print("K-means (1-D) with improved step-by-step visualization\n")
-    s = input("Enter data points (space separated, e.g. '5 12 7 4 3 11 19 25 13 14'): ").strip()
-    data = parse_input_points(s)
-    if len(data) == 0:
-        raise SystemExit("No data provided.")
-
-    k = int(input("Enter number of clusters k (e.g. 2): ").strip())
-    init = input(f"Enter {k} initial centroids (space separated) or press Enter to auto-pick: ").strip()
-    init_centroids = None
-    if init:
-        pcs = init.split()
-        if len(pcs) != k:
-            print("Number of centroids given doesn't match k — ignoring and auto-picking.")
-        else:
-            init_centroids = [float(x) for x in pcs]
-
-    history = kmeans_1d(data, k, init_centroids)
-    
-    # Print textual step-by-step
+    d=p(input("Enter data points (space separated, e.g. '5 12 7 4 3 11 19 25 13 14'): "))
+    if len(d)==0:raise SystemExit("No data provided.")
+    k=int(input("Enter number of clusters k (e.g. 2): "))
+    init=input(f"Enter {k} initial centroids (space separated) or press Enter to auto-pick: ").strip();c0=None
+    if init:c0s=init.split();c0=[float(x) for x in c0s] if len(c0s)==k else None
+    h=kmeans(d,k,c0)
     print("\nK-means Iterations (text):")
-    for snap in history:
-        it = snap["iter"]
-        cent = snap["centroids"]
-        assg = snap["assignments"]
-        clusters = {j: [] for j in range(len(cent))}
-        for x, a in zip(data, assg):
-            clusters[a].append(x)
-        print(f"\nStep {it}: centroids = {[round(c, 4) for c in cent]}")
-        for j in sorted(clusters.keys()):
-            print(f"  C{j} = {clusters[j]}")
-
-    # Draw improved visualization
-    draw_kmeans_history(data, history)
+    for s in h:
+        it=s["iter"];c=s["c"];r=s["r"];clusters={j:[] for j in range(len(c))}
+        [clusters[a].append(x) for x,a in zip(d,r)]
+        print(f"\nStep {it}: centroids = {[round(x,4) for x in c]}")
+        for j in sorted(clusters.keys()):print(f"  C{j} = {clusters[j]}")
+    v(d,h)

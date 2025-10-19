@@ -57,7 +57,7 @@ def hc_levelwise(ca, cb, goal):
     yield ("fail", G.copy(), [], None)
 
 # Recursive position calculation for tree layout
-def tree_pos(G, root=None, w=1.5, gap=0.5, y=0, x=0.5, pos=None, par=None):
+def tree_pos(G, root=None, w=1.5, gap=0.5, y=0.0, x=0.5, pos=None, par=None):
     if not G.nodes:
         return {}
     if root is None:
