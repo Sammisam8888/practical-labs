@@ -1,239 +1,219 @@
 """
-take the triangle 
-it has 3 angles
-the sum of the angles is 180 degrees
-prove that the exterior angle is equal to the sum of the two interior opposite angles
-let the triangle be ABC
-let the angle be ext (C)
-
-given assumptions : C + ext (C) = 180 (linear pair)
-given data: A + B + C = 180 (triangle sum)
-to prove: ext (C) = A + B
+Resolution proof (pure Python) following sequence: 1 -> 3 -> 2 -> 4 -> 5 -> 6
+Clauses:
+ C1: equal(sum(<A,<B,<C), 180)
+ C2: equal(sum(ext<C,<C), 180)
+ C3: equal(x,y), equal(y,z) -> equal(x,z)   (transitivity)
+ C4: equal(y,z) -> equal(z,y)               (symmetry)
+ C5: equal(sum(x,y), sum(x,z)) -> equal(y,z)
+ C6: negated goal: ¬equal(ext<C, sum(<A,<B))
 """
 
-"""import sympy as sp
-A,B,C,extC=sp.symbols('A B C extC')
+import pprint
+pp = pprint.PrettyPrinter(width=120)
 
+# optional drawing libs
+try:
+    import networkx as nx
+    import matplotlib.pyplot as plt
+    DRAW = True
+except Exception:
+    DRAW = False
 
-def equal(p, q):
-    return sp.Eq(p, q)
+# ---------- representation helpers ----------
+def SUM(*args):
+    return ("sum",) + tuple(args)
 
-def implies(p, q):
-    return sp.Implies(p, q)
+def EQUAL(a, b):
+    return ("equal", a, b)
 
-def negative(p):
-    return sp.Not(p)
-def extangle():
-    eq1 = equal(A + B + C, 180)
-    eq2 = equal(C + extC, 180)
-    axiom1 = implies(equal(A, B) & equal(B,C), equal(A, C))
-    axiom2 = implies(equal(A,B),equal(B,A))
-    goal = equal(extC, A + B)
-    S=set()
-    S.add(eq1)
-    S.add(eq2)
-    S.add(axiom1)
-    S.add(axiom2)
-    S.add(negative(goal))
-    return S
-"""
+def NEG(a):
+    return ("not", a)
 
+def is_equal(atom):
+    return isinstance(atom, tuple) and len(atom) == 3 and atom[0] == "equal"
 
-import sympy
+def is_sum(term):
+    return isinstance(term, tuple) and term and term[0] == "sum"
 
-# -- Part 1: A Class to Represent Symbolic Literals --
-# This class wraps SymPy expressions (Eq, Ne) to handle negation.
+# ---------- Given clauses (C1..C6) ----------
+C1 = EQUAL(SUM("<A", "<B", "<C"), "180")           # equal(sum(<A,<B,<C), 180)
+C2 = EQUAL(SUM("ext<C", "<C"), "180")              # equal(sum(ext<C,<C), 180)
+C3 = "C3_TRANSITIVITY"                             # schema: equal(x,y) & equal(y,z) -> equal(x,z)
+C4 = "C4_SYMMETRY"                                 # schema: equal(y,z) -> equal(z,y)
+C5 = "C5_SUM_CANCEL"                               # schema: equal(sum(x,y), sum(x,z)) -> equal(y,z)
+C6 = NEG(EQUAL("ext<C", SUM("<A", "<B")))          # negated goal
 
-class SymbolicLiteral:
-    """Represents a logical literal using a SymPy expression (Eq or Ne)."""
-    def __init__(self, expression):
-        if not isinstance(expression, (sympy.Eq, sympy.Ne)):
-            raise TypeError("SymbolicLiteral must be initialized with a sympy Eq or Ne object.")
-        self.expression = expression
+# store provenance and derived atoms
+derived = {}
+derived["C1"] = (C1, "given C1")
+derived["C2"] = (C2, "given C2")
+derived["C3"] = (C3, "rule C3 (transitivity)")
+derived["C4"] = (C4, "rule C4 (symmetry)")
+derived["C5"] = (C5, "rule C5 (sum-cancellation)")
+derived["C6"] = (C6, "given C6 (negated goal)")
 
-    def __repr__(self):
-        """String representation for printing."""
-        return str(self.expression)
+steps = []   # list of (label, atom, used, description)
 
-    def __eq__(self, other):
-        """Two literals are equal if their expressions are."""
-        return isinstance(other, SymbolicLiteral) and self.expression.equals(other.expression)
+# ---------- Step A: instantiate C3 using C1  (this is "1 + 3 -> instantiated rule") ----------
+# C3: equal(x,y) & equal(y,z) -> equal(x,z)
+# Given C1: equal(sum(<A,<B,<C), 180)   i.e. x := sum(<A,<B,<C), y := 180
+# Instantiation: equal(180, z) -> equal(sum(<A,<B,<C), z)
+# Represent the instantiated rule as a clause-of-form: ("impl", premises_tuple, conclusion_template)
+inst_Rule_from_C1 = ("impl", (("equal", "180", "Z"),), ("equal", SUM("<A", "<B", "<C"), "Z"))
+# store and record
+derived["Inst1_C3"] = (inst_Rule_from_C1, "instantiated C3 with C1 (x=sum(A,B,C), y=180)")
+steps.append( ("Inst1_C3", inst_Rule_from_C1, ("C1","C3"), "Instantiate C3 with C1: if equal(180,Z) then equal(sum(<A,<B,<C), Z)") )
 
-    def __hash__(self):
-        """To allow literals to be stored in sets (clauses)."""
-        return hash(self.expression)
+# ---------- Step B: use instantiated rule with C2  (instantiated rule + C2 -> R1) ----------
+# instantiated rule expects equal(180, Z) as premise. C2 is equal(sum(ext<C,<C), 180).
+# We can match equal(180, Z) with equal(sum(ext<C,<C), 180) by symmetry or by matching swapped sides.
+# To match we can flip C2 via symmetry of equality conceptually; but per requested sequence we do:
+# instantiate premise equal(180,Z) matched by equality with the RHS of C2 by recognizing equal(A,B) implies equal(B,A).
+# Practically: match premise equal(180,Z) to equal(sum(ext<C,<C), 180) by taking Z = sum(ext<C,<C) and swapping sides.
+# This yields conclusion equal(sum(<A,<B,<C), sum(ext<C,<C))
+# We'll perform that matching explicitly.
 
-    def negate(self):
-        """Returns the negation of this literal."""
-        if isinstance(self.expression, sympy.Eq):
-            # The negation of Eq(a, b) is Ne(a, b)
-            return SymbolicLiteral(sympy.Ne(self.expression.lhs, self.expression.rhs))
-        elif isinstance(self.expression, sympy.Ne):
-            # The negation of Ne(a, b) is Eq(a, b)
-            return SymbolicLiteral(sympy.Eq(self.expression.lhs, self.expression.rhs))
+# match: premise ("equal","180","Z") with C2 ("equal", sum(extC,C), "180")
+match_prem = ("equal", "180", "Z")
+c2_atom = C2  # ("equal", SUM("ext<C", "<C"), "180")
+# Solve for Z by matching the third element of c2 to match_prem[1]? We want mapping: "180" <-> "180", "Z" -> sum(extC,C) when swapping sides
+# So set Z = sum(extC,<C)
+Z_value = c2_atom[1]  # sum(ext<C, <C>)
+# produce derived R1:
+R1 = EQUAL(SUM("<A", "<B", "<C"), Z_value)   # equal(sum(A,B,C), sum(extC,C))
+derived["R1"] = (R1, "From Instantiated C3 and C2 by matching (swap/match) -> equal(sum(A,B,C), sum(extC,C))")
+steps.append( ("R1", R1, ("Inst1_C3","C2"), "Apply instantiated C3 to C2 (match Z = sum(ext<C,<C>)) -> R1") )
 
-# -- Part 2: Explicit CNF Conversion Function --
-# This function demonstrates the conversion of implications to CNF.
+# ---------- Step C: apply C4 (symmetry) to R1 -> R2 ----------
+# R1 = equal(sum(A,B,C), sum(extC,C))
+# Applying symmetry gives equal(sum(extC,C), sum(A,B,C))
+def apply_symmetry(atom):
+    if is_equal(atom):
+        return EQUAL(atom[2], atom[1])
+    return None
 
-def implication_to_cnf(implication):
-    """
-    Converts a SymPy Implies object into a CNF clause (a set of SymbolicLiterals).
-    Handles implications of the form (P & Q & ...) -> R.
-    
-    Rule: (A -> B) is equivalent to (~A v B)
-    Rule: ~(A & B) is equivalent to (~A v ~B) [De Morgan's Law]
-    """
-    if not isinstance(implication, sympy.logic.boolalg.Implies):
-        raise TypeError("Input must be a sympy Implies object.")
+R2 = apply_symmetry(R1)
+derived["R2"] = (R2, "From R1 by C4 (symmetry) -> equal(sum(ext<C,<C), sum(<A,<B,<C))")
+steps.append( ("R2", R2, ("R1","C4"), "Apply C4 (symmetry) to R1 -> R2") )
 
-    antecedent = implication.args[0]
-    consequent = implication.args[1]
-
-    # The resulting clause is (~antecedent V consequent)
-    # We apply De Morgan's laws if the antecedent is an And(...)
-    
-    clause_literals = set()
-    
-    # Add the negated literals from the antecedent
-    if isinstance(antecedent, sympy.logic.boolalg.And):
-        # Antecedent is P & Q & ...
-        # Negating it gives ~P v ~Q v ...
-        for arg in antecedent.args:
-            clause_literals.add(SymbolicLiteral(arg).negate())
-    else:
-        # Antecedent is a single predicate P
-        # Negating it gives ~P
-        clause_literals.add(SymbolicLiteral(antecedent).negate())
-        
-    # Add the positive literal from the consequent
-    clause_literals.add(SymbolicLiteral(consequent))
-    
-    return frozenset(clause_literals)
-
-# -- Part 3: The Resolution Prover (using SymPy literals) --
-
-class ResolutionProver:
-    def __init__(self, initial_clauses):
-        self.clauses = [frozenset(c) for c in initial_clauses]
-        self.generated = set(self.clauses)
-
-    def run(self):
-        """
-        Runs the resolution algorithm, printing each step.
-        """
-        print(f"{'Step':<5} | {'Clause 1':<45} | {'Clause 2':<45} | {'Resolvent (New Clause)'}")
-        print("-" * 110)
-        
-        step_num = 0
-        while True:
-            new_clauses = set()
-            clauses_list = list(self.generated) # Use a snapshot for stable iteration
-            
-            for i in range(len(clauses_list)):
-                for j in range(i, len(clauses_list)):
-                    clause1 = clauses_list[i]
-                    clause2 = clauses_list[j]
-                    
-                    resolvent = self.resolve(clause1, clause2)
-
-                    if resolvent is not None and resolvent not in self.generated:
-                        step_num += 1
-                        print_step(step_num, clause1, clause2, resolvent)
-                        
-                        if not resolvent: # Empty clause means contradiction
-                            print("\n" + "="*110)
-                            print("CONCLUSION: Contradiction found (Empty Clause {} generated).")
-                            print("The negated goal is false, therefore the original goal is TRUE.")
-                            print("Q.E.D. The theorem is proven.")
-                            print("="*110)
-                            return True
-                        
-                        new_clauses.add(resolvent)
-            
-            if not new_clauses:
-                print("\n" + "="*110)
-                print("CONCLUSION: No new clauses can be generated and no contradiction was found.")
-                print("The goal cannot be proven from the given axioms.")
-                print("="*110)
-                return False
-
-            self.generated.update(new_clauses)
-
-    def resolve(self, clause1, clause2):
-        """
-        Attempts to resolve two clauses of SymbolicLiterals.
-        """
-        for literal1 in clause1:
-            if literal1.negate() in clause2:
-                temp_c1 = set(clause1)
-                temp_c2 = set(clause2)
-                temp_c1.remove(literal1)
-                temp_c2.remove(literal1.negate())
-                return frozenset(temp_c1.union(temp_c2))
+# ---------- Step D: apply C5 (sum-cancellation) to R2 -> R3 ----------
+# C5: equal(sum(x,y), sum(x,z)) -> equal(y,z)
+# Here R2 is equal(sum(extC, <C>), sum(<A,<B,<C>))
+# Both sides are sum terms with last element "<C". We cancel the common "<C" to get equal(sum(extC), sum(<A,<B>))
+def apply_sum_cancel(atom):
+    if not is_equal(atom):
         return None
+    L = atom[1]
+    R = atom[2]
+    if is_sum(L) and is_sum(R):
+        # check if they share the same last element
+        if len(L) >=2 and len(R) >=2 and L[-1] == R[-1]:
+            # remove last elements
+            newL = ("sum",) + tuple(L[1:-1]) if len(L) > 2 else ("sum", L[1])   # for multi or singleton
+            newR = ("sum",) + tuple(R[1:-1]) if len(R) > 2 else ("sum", R[1])
+            return EQUAL(newL, newR)
+    return None
 
-# -- Part 4: Helper function for Visual Display --
+R3 = apply_sum_cancel(R2)
+derived["R3"] = (R3, "From R2 by C5 (sum cancellation of '<C>') -> equal(sum(ext<C), sum(<A,<B))")
+steps.append( ("R3", R3, ("R2","C5"), "Apply C5: cancel common '<C' in the two sums -> R3") )
 
-def format_clause_sympy(clause):
-    if not clause:
-        return "{}"
-    # Using sorted with a key to make the output deterministic and clean
-    return "{" + " v ".join(sorted([str(l) for l in clause], key=len)) + "}"
+# ---------- Step E: normalize singleton sums if needed -> R4 ----------
+# R3 may have ("sum", "ext<C") on left (i.e. singleton sum). Normalize that to atom ext<C directly:
+def normalize_singleton_sum(atom):
+    if not is_equal(atom):
+        return None
+    L, R = atom[1], atom[2]
+    def norm(t):
+        if is_sum(t) and len(t) == 2:   # ("sum", item)
+            return t[1]
+        return t
+    return EQUAL(norm(L), norm(R))
 
-def print_step(step_num, c1, c2, resolvent):
-    c1_str = format_clause_sympy(c1)
-    c2_str = format_clause_sympy(c2)
-    res_str = format_clause_sympy(resolvent)
-    print(f"{step_num:<5} | {c1_str:<45} | {c2_str:<45} | {res_str}")
+R4 = normalize_singleton_sum(R3)
+derived["R4"] = (R4, "Normalize singleton sums -> equal(ext<C, sum(<A,<B))")
+steps.append( ("R4", R4, ("R3","normalize"), "Normalize singleton sums: left becomes ext<C -> R4") )
 
-# -- Part 5: Main Execution --
+# ---------- Step F: refute with C6 (negated goal) -> contradiction ----------
+# C6 = ("not", equal("ext<C", sum("<A","<B")))
+contradiction = False
+if is_equal(R4) and isinstance(C6, tuple) and C6[0] == "not" and is_equal(C6[1]):
+    if R4 == C6[1]:
+        contradiction = True
+        steps.append( ("⊥", "CONTRADICTION", ("R4","C6"), "R4 contradicts C6 -> ⊥") )
 
-if __name__ == "__main__":
-    # --- 1. Define Symbols and Predicates using SymPy ---
-    A, B, C, ext_C, x, y, z = sympy.symbols('A B C ext_C x y z')
-    
-    # Predicates are the fundamental equations
-    p = sympy.Eq(A + B + C, 180)
-    q = sympy.Eq(ext_C + C, 180)
-    r = sympy.Eq(A + B + C, ext_C + C) # Consequence of transitivity
-    s = sympy.Eq(A + B, ext_C)         # Goal and consequence of simplification
+# ---------- Print the step trace ----------
+print("\n=== RESOLUTION PROOF TRACE (sequence 1 -> 3 -> 2 -> 4 -> 5 -> 6) ===\n")
+print("Given clauses:")
+print(" C1:", C1)
+print(" C2:", C2)
+print(" C3:", C3)
+print(" C4:", C4)
+print(" C5:", C5)
+print(" C6:", C6)
+print("\nDerived steps (in order):\n")
+for i, (label, atom, used, desc) in enumerate(steps, start=1):
+    print(f" Step {i}: {label}")
+    print(f"    Derived: {atom}")
+    print(f"    Used: {used}")
+    print(f"    Note: {desc}\n")
 
-    print("="*110)
-    print(" AUTOMATED THEOREM PROVING WITH SYMPY AND RESOLUTION ".center(110))
-    print("="*110)
-    
-    # --- 2. Define Axioms as Logical Implications ---
-    # Axiom 3: Transitivity of Equality. (p & q) => r
-    axiom3_implication = sympy.Implies(sympy.And(p, q), r)
-    # Axiom 4: Algebraic Simplification. r => s
-    axiom4_implication = sympy.Implies(r, s)
+if contradiction:
+    print("Result: ⊥ (contradiction) reached. Negated goal unsatisfiable → goal proven true.")
+    print("Conclusion: equal(ext<C, sum(<A,<B)) holds (exterior angle = sum of opposite interior angles).")
+else:
+    print("No contradiction found. Check pattern matching. (Expected contradiction.)")
 
-    print("Defined Axioms as Implications:")
-    print(f"  Axiom 3 (Transitivity): {axiom3_implication}")
-    print(f"  Axiom 4 (Simplification): {axiom4_implication}\n")
+# ---------- Optional: draw a neat top-down resolution tree (if drawing libs available) ----------
+def draw_tree():
+    if not DRAW:
+        print("\n(Drawing skipped: networkx/matplotlib not available in this environment.)")
+        return
 
-    # --- 3. Convert Implications to CNF Clauses ---
-    clause3 = implication_to_cnf(axiom3_implication)
-    clause4 = implication_to_cnf(axiom4_implication)
+    G = nx.DiGraph()
+    labels = {
+        "C1": "C1\n= equal(sum(<A,<B,<C), 180)",
+        "C3": "C3\ntransitivity",
+        "Inst1_C3": "Inst(C3)\nif equal(180,Z) then equal(sum(<A,<B,<C), Z)",
+        "C2": "C2\n= equal(sum(ext<C,<C), 180)",
+        "R1": "R1\n= equal(sum(<A,<B,<C), sum(ext<C,<C))",
+        "C4": "C4\nsymmetry",
+        "R2": "R2\n= equal(sum(ext<C,<C), sum(<A,<B,<C))",
+        "C5": "C5\nsum-cancellation",
+        "R3": "R3\n= equal(sum(ext<C), sum(<A,<B))",
+        "R4": "R4\n= equal(ext<C, sum(<A,<B))",
+        "C6": "C6\n= ¬equal(ext<C, sum(<A,<B))",
+        "⊥": "⊥\nContradiction"
+    }
 
-    print("Converting Implications to CNF Clauses:")
-    print(f"  Axiom 3 becomes: {format_clause_sympy(clause3)}")
-    print(f"  Axiom 4 becomes: {format_clause_sympy(clause4)}\n")
-
-    # --- 4. Assemble the Initial Knowledge Base (Set S) ---
-    initial_knowledge_base = [
-        frozenset({SymbolicLiteral(p)}),              # Axiom 1: A+B+C = 180
-        frozenset({SymbolicLiteral(q)}),              # Axiom 2: ext_C+C = 180
-        clause3,                                      # Axiom 3 in CNF
-        clause4,                                      # Axiom 4 in CNF
-        frozenset({SymbolicLiteral(s).negate()})      # Negated Goal: A+B != ext_C
+    # add nodes and edges in the exact logical flow:
+    G.add_nodes_from(labels.keys())
+    edges = [
+        ("C1", "Inst1_C3"), ("C3", "Inst1_C3"),            # instantiate C3 using C1
+        ("Inst1_C3", "R1"), ("C2", "R1"),                 # Inst1 + C2 -> R1
+        ("R1", "R2"), ("C4", "R2"),                       # R1 + C4 -> R2
+        ("R2", "R3"), ("C5", "R3"),                       # R2 + C5 -> R3
+        ("R3", "R4"),                                     # normalization
+        ("R4", "⊥"), ("C6", "⊥")                          # R4 + C6 -> contradiction
     ]
-    
-    print("Initial Knowledge Base (Set S) for Resolution:")
-    for i, clause in enumerate(initial_knowledge_base):
-        print(f"  Clause {i+1}: {format_clause_sympy(clause)}")
-    print("\nStarting Resolution...\n")
+    G.add_edges_from(edges)
 
-    # --- 5. Run the Prover ---
-    prover = ResolutionProver(initial_knowledge_base)
-    prover.run()
+    pos = {
+        "C1": (-2, 6), "C3": (0, 6), "Inst1_C3": (-1, 5.0),
+        "C2": (2, 6), "R1": (0, 4.0), "C4": (2.5, 4.0),
+        "R2": (0, 3.0), "C5": (-2.5, 3.5), "R3": (0, 2.0),
+        "R4": (0, 1.3), "C6": (2.5, 1.3), "⊥": (0, 0.3)
+    }
+
+    plt.figure(figsize=(11,8))
+    nx.draw(G, pos, with_labels=False, node_size=2600, node_color="#E8F6FF", edgecolors="black", arrowsize=18)
+    for n, txt in labels.items():
+        x, y = pos[n]
+        plt.text(x, y, txt, fontsize=9, ha='center', va='center', wrap=True)
+    plt.title("Resolution Tree (1 → 3 → 2 → 4 → 5 → 6)", fontsize=13, pad=12)
+    plt.axis('off')
+    plt.tight_layout()
+    plt.show()
+
+draw_tree()

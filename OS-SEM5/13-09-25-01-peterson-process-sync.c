@@ -12,7 +12,7 @@ void *process(void *arg) {
     int id = *(int *)arg;
     int other = 1 - id;
 
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 2; i++) {
         flag[id] = true;
         turn = other;
 
