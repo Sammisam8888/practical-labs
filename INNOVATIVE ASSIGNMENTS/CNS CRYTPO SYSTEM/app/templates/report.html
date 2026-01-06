@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% block title %}Simulation Report{% endblock %}
+{% block content %}
+<style>
+  #reportChart {
+    max-height: 320px;
+    height: 320px !important;
+  }
+  .chart-container {
+    position: relative;
+    height: 320px;
+    overflow: hidden;
+  }
+  .info-box {
+    font-size: 0.9rem;
+    color: #9ca3af;
+    background: rgba(31,41,55,0.6);
+    border-left: 3px solid #6366f1;
+    padding: 10px 14px;
+    border-radius: 0.5rem;
+  }
+</style>
+
+<h1 class="text-3xl font-semibold mb-6">Simulation Report — {{ sim.name }}</h1>
+
+<div class="grid md:grid-cols-2 gap-6">
+  <div class="card p-6 rounded-lg shadow">
+    <h3 class="text-lg font-semibold mb-3 text-indigo-400">Metadata</h3>
+    <div class="text-sm text-gray-300 space-y-2">
+      <div><b>Created at:</b> {{ sim.created_at }}</div>
+      <div><b>Parameters:</b></div>
+      <pre class="mono bg-gray-800 p-3 rounded-lg text-gray-400 overflow-x-auto">{{ sim.parameters }}</pre>
+    </div>
+  </div>
+
+  <div class="card p-6 rounded-lg shadow">
+    <h3 class="text-lg font-semibold mb-3 text-indigo-400">Key Metrics</h3>
+    <div class="text-sm text-gray-300 grid grid-cols-2 gap-3">
+      <div><b>Nodes:</b> {{ result_data.num_nodes }}</div>
+      <div><b>Alive:</b> {{ result_data.alive_nodes }}</div>
+      <div><b>Latency:</b> {{ result_data.avg_latency_ms | round(2) }} ms</div>
+      <div><b>Double Spend Risk:</b> {{ (result_data.double_spend_risk * 100) | round(2) }}%</div>
+    </div>
+  </div>
+</div>
+
+<div class="mt-8 card p-6 rounded-lg shadow">
+  <h3 class="text-xl font-semibold mb-4">Throughput Timeline</h3>
+  <p class="info-box mb-4">
+    The graph below illustrates how network throughput (number of confirmed transactions per time step)
+    evolved throughout the simulation.
+  </p>
+
+  <div class="chart-container">
+    <canvas id="reportChart"></canvas>
+  </div>
+
+  <div id="chartError" class="text-red-500 mt-4 hidden">
+    ⚠️ No data available — try re-running the simulation with valid parameters.
+  </div>
+
+  <div class="mt-4 text-sm text-gray-400">
+    <ul class="list-disc ml-5 space-y-1">
+      <li><b>X-axis:</b> Simulation time steps.</li>
+      <li><b>Y-axis:</b> Throughput (transactions processed per step).</li>
+      <li><b>Stable line:</b> Indicates a robust, efficient blockchain network.</li>
+      <li><b>Fluctuations:</b> Represent latency, network failures, or potential attacks.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- Chart.js (ensure loaded before script runs) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+window.addEventListener('DOMContentLoaded', ()=>{
+  try {
+    const data = {{ result_data | tojson | safe }};
+    const chartCanvas = document.getElementById('reportChart');
+    const chartError = document.getElementById('chartError');
+
+    if(!data || !data.timeline || data.timeline.length === 0){
+      chartCanvas.classList.add('hidden');
+      chartError.classList.remove('hidden');
+      return;
+    }
+
+    const labels = data.timeline.map(x=>x.t);
+    const vals = data.timeline.map(x=>x.throughput);
+
+    const ctx = chartCanvas.getContext('2d');
+    if(window.reportChart){ window.reportChart.destroy(); }
+
+    window.reportChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Network Throughput',
+          data: vals,
+          borderColor: '#6366f1',
+          backgroundColor: 'rgba(99,102,241,0.2)',
+          tension: 0.3,
+          fill: true,
+          pointRadius: 0
+        }]
+      },
+      options: {
+        maintainAspectRatio: false,
+        responsive: true,
+        scales: {
+          x: {
+            title: { display: true, text: 'Time (simulation steps)', color: '#ccc' },
+            ticks: { color: '#999' }
+          },
+          y: {
+            title: { display: true, text: 'Throughput (transactions/step)', color: '#ccc' },
+            ticks: { color: '#999' }
+          }
+        },
+        plugins: { legend: { labels: { color: '#ccc' } } }
+      }
+    });
+  } catch(err){
+    console.error("Chart render error:", err);
+    document.getElementById('chartError').classList.remove('hidden');
+  }
+});
+</script>
+{% endblock %}

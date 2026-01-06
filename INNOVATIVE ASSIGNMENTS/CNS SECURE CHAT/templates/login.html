@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Secure Chat — Login</title>
+  <link rel="stylesheet" href="/static/css/styles.css" />
+</head>
+<body>
+  <div class="container center">
+    <div class="card login-card">
+      <h1>🔐 Secure Chat</h1>
+      <p class="muted">End-to-End Encrypted Communication using SSL/TLS</p>
+      <form method="POST" action="/login">
+        <label for="username">Username</label>
+        <input id="username" name="username" required />
+
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" required />
+
+        <div class="actions">
+          <button type="submit" class="btn primary">Login Securely</button>
+        </div>
+      </form>
+      <p class="muted">No account? <a href="/register">Register here</a></p>
+      <small class="muted">This connection is protected with SSL/TLS</small>
+    </div>
+  </div>
+</body>
+</html>

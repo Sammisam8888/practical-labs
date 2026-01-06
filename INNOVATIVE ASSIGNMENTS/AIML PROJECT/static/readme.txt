@@ -1,0 +1,1 @@
+Static assets directory. Add JS/CSS as needed.

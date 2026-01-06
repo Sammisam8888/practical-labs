@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Secure Chat — Login</title>
+  <link rel="stylesheet" href="/static/css/styles.css" />
+</head>
+<body>
+  <div class="container center">
+    <div class="card login-card">
+      <h1>Secure Chat</h1>
+      <p class="muted">A demo secure chat using TLS (WSS) — enter a display name to continue</p>
+      <form id="loginForm" method="get" action="/chat">
+        <label for="username">Display name</label>
+        <input id="username" name="username" type="text" required maxlength="32" placeholder="e.g., Trishna" />
+        <div class="actions">
+          <button type="submit" class="btn primary">Join Chat</button>
+        </div>
+      </form>
+      <small class="muted">This is a demo for academic use. Use trusted certificates in production.</small>
+    </div>
+  </div>
+</body>
+</html>

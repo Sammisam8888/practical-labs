@@ -1,0 +1,28 @@
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>AIML Project - {% block title %}{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body { background: #0f172a; color:#e5e7eb; }
+      .card { background: rgba(15,23,42,0.6); border: 1px solid rgba(255,255,255,0.04); }
+      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace; }
+    </style>
+  </head>
+  <body class="min-h-screen p-6">
+    <nav class="max-w-4xl mx-auto flex justify-between items-center mb-6">
+      <a class="flex items-center gap-3" href="{{ url_for('index') }}">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-teal-400 flex items-center justify-center font-bold">AI</div>
+        <div class="text-lg font-semibold">Exit-Poll Predictor</div>
+      </a>
+      <div><a class="text-sm text-gray-300" href="{{ url_for('about') }}">About</a></div>
+    </nav>
+    <main class="max-w-4xl mx-auto">
+      {% block content %}{% endblock %}
+    </main>
+    <footer class="text-center text-gray-400 mt-8">AIML Project • Sample scaffold</footer>
+  </body>
+</html>

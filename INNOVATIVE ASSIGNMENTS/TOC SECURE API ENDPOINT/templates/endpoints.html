@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Endpoints — TOC API Secure{% endblock %}
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+  <div>
+    <h1 class="text-3xl font-bold">API Endpoints — DFA Designer</h1>
+    <p class="text-gray-400 mt-1">Create endpoint specs and view DFA-based security transformations.</p>
+  </div>
+  <div><a class="px-4 py-2 bg-indigo-600 rounded" href="{{ url_for('new_endpoint') }}">Create endpoint</a></div>
+</div>
+
+<div class="space-y-4">
+  {% for ep in endpoints %}
+  <div class="card p-4 flex justify-between items-center">
+    <div>
+      <div class="font-semibold">{{ ep.name }} <span class="text-sm text-gray-400">({{ ep.method }})</span></div>
+      <div class="text-sm text-gray-400">{{ ep.path }}</div>
+      <div class="text-xs text-gray-500 mt-1">Created: {{ ep.created_at }}</div>
+    </div>
+    <div class="flex gap-2">
+      <a class="px-3 py-2 bg-gray-700 rounded" href="{{ url_for('view_endpoint', ep_id=ep.id) }}">View DFA</a>
+      <a class="px-3 py-2 bg-gray-600 rounded" href="{{ url_for('export_spec', ep_id=ep.id) }}">Download secured spec</a>
+    </div>
+  </div>
+  {% else %}
+  <div class="card p-4 text-gray-400">No endpoints yet. Click Create endpoint to add one.</div>
+  {% endfor %}
+</div>
+{% endblock %}

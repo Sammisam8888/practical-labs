@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}New Endpoint — TOC API Secure{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Create new endpoint</h1>
+<form method="post" action="{{ url_for('new_endpoint') }}">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+      <label class="text-sm text-gray-300">Name</label>
+      <input name="name" class="mt-1 block w-full rounded bg-gray-800 px-3 py-2" placeholder="Login">
+    </div>
+    <div>
+      <label class="text-sm text-gray-300">Path</label>
+      <input name="path" class="mt-1 block w-full rounded bg-gray-800 px-3 py-2" placeholder="/api/login">
+    </div>
+    <div>
+      <label class="text-sm text-gray-300">Method</label>
+      <select name="method" class="mt-1 block w-40 rounded bg-gray-800 px-3 py-2">
+        <option>POST</option><option>GET</option><option>PUT</option><option>DELETE</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="mt-4">
+    <label class="text-sm text-gray-300">Query Schema (JSON)</label>
+    <textarea name="query_schema" class="mt-1 block w-full rounded bg-gray-800 px-3 py-2" rows="3">{}</textarea>
+  </div>
+  <div class="mt-4">
+    <label class="text-sm text-gray-300">Body Schema (JSON)</label>
+    <textarea name="body_schema" class="mt-1 block w-full rounded bg-gray-800 px-3 py-2" rows="6">{ "username": {"type":"string"}, "password": {"type":"string"} }</textarea>
+  </div>
+  <div class="mt-4">
+    <label class="text-sm text-gray-300">Response Schema (JSON)</label>
+    <textarea name="response_schema" class="mt-1 block w-full rounded bg-gray-800 px-3 py-2" rows="3">{}</textarea>
+  </div>
+
+  <div class="mt-4">
+    <button class="px-4 py-2 bg-green-500 rounded">Create</button>
+    <a href="{{ url_for('index') }}" class="ml-3 text-gray-400">Cancel</a>
+  </div>
+</form>
+{% endblock %}

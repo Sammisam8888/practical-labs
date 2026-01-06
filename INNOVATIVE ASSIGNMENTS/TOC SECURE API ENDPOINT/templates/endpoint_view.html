@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}View Endpoint{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">{{ ep.name }}</h1>
+<div class="grid md:grid-cols-2 gap-4">
+  <div class="card p-4">
+    <h3 class="font-semibold mb-2">Original Spec</h3>
+    <pre class="text-sm">{{ spec | tojson(indent=2) }}</pre>
+  </div>
+  <div class="card p-4">
+    <h3 class="font-semibold mb-2">Secured / Transformed Spec</h3>
+    <pre class="text-sm">{{ secured | tojson(indent=2) }}</pre>
+    <div class="mt-3">
+      <strong>Applied rules:</strong>
+      <ul class="list-disc ml-5">
+        {% for note in secured.applied_rules %}
+        <li class="text-sm text-gray-300">{{ note }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+<div class="mt-4"><a href="{{ url_for('index') }}" class="px-3 py-2 bg-gray-700 rounded">Back</a></div>
+{% endblock %}

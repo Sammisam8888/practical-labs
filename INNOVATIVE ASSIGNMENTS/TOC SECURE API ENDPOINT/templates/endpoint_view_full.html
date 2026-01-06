@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block title %}{{ ep.name }} — DFA View{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-3">{{ ep.name }} — DFA visualization</h1>
+
+<div class="grid md:grid-cols-3 gap-4">
+  <div class="card p-4 md:col-span-2">
+    <h3 class="font-semibold">DFA Graph (interactive)</h3>
+    <div id="mynetwork"></div>
+    <div class="mt-3 text-sm text-gray-400">Click a state node to inspect the snapshot and explanation. Use the Play button to step through the pipeline.</div>
+    <div class="mt-3 flex gap-2">
+      <button id="playBtn" class="px-3 py-1 bg-indigo-600 rounded">Play</button>
+      <button id="stepBtn" class="px-3 py-1 bg-gray-700 rounded">Step</button>
+      <button id="resetBtn" class="px-3 py-1 bg-gray-600 rounded">Reset View</button>
+    </div>
+  </div>
+
+  <div class="card p-4">
+    <h3 class="font-semibold">Original Spec</h3>
+    <pre>{{ spec | tojson(indent=2) }}</pre>
+    <h3 class="font-semibold mt-4">Symbols</h3>
+    <pre>{{ dfa.symbols | tojson(indent=2) }}</pre>
+    <h3 class="font-semibold mt-4">Applied Rules</h3>
+    <pre>{{ dfa.applied_rules | tojson(indent=2) }}</pre>
+    <a class="inline-block mt-3 px-3 py-2 bg-gray-700 rounded" href="{{ url_for('export_spec', ep_id=ep.id) }}">Download secured spec</a>
+  </div>
+</div>
+
+<div class="mt-4 card p-4">
+  <h3 class="font-semibold">Final secured spec</h3>
+  <pre>{{ dfa.final_spec | tojson(indent=2) }}</pre>
+</div>
+
+<script>
+const dfa = {{ dfa | tojson }};
+const nodes = []; const edges = [];
+const info = dfa.state_info || {};
+dfa.states.forEach(s=>{
+  const isStart = (s === dfa.start);
+  const isAccept = dfa.accepts.includes(s);
+  nodes.push({id:s,label:s, title: info[s] ? info[s].desc : s, color: isStart ? '#6366f1' : (isAccept ? '#10b981' : undefined)});
+});
+for(const [from, tr] of Object.entries(dfa.transitions || {})){
+  for(const [sym, to] of Object.entries(tr)){
+    edges.push({from, to, label: sym, arrows: 'to'});
+  }
+}
+
+const container = document.getElementById('mynetwork');
+const data = { nodes: new vis.DataSet(nodes), edges: new vis.DataSet(edges) };
+const options = { interaction:{ hover:true }, physics:{ enabled:false }, nodes:{ shape:'box', font:{ color:'#e5e7eb' } }, edges:{ font:{ align:'top' } } };
+const network = new vis.Network(container, data, options);
+
+function showState(s){
+  const st = info[s] || {};
+  let html = '<div><b>' + s + '</b></div>';
+  html += '<div class="mt-2"><b>Description:</b> ' + (st.desc || '') + '</div>';
+  if(st.applied_rule) html += '<div class="mt-2"><b>Applied rule:</b> ' + st.applied_rule + '</div>';
+  if(st.explanation) html += '<div class="mt-2"><b>Explanation:</b> ' + st.explanation + '</div>';
+  if(st.spec) html += '<div class="mt-2"><b>Spec snapshot:</b><pre style="background:#021028;padding:8px;border-radius:6px;margin-top:6px;color:#cbd5e1">' + JSON.stringify(st.spec,null,2) + '</pre></div>';
+  document.getElementById('stateInfoPanel').innerHTML = html;
+}
+
+network.on('selectNode', params=>{
+  const id = params.nodes[0];
+  showState(id);
+});
+
+const panel = document.createElement('div');
+panel.id = 'stateInfoPanel';
+panel.style.marginTop = '12px';
+panel.className = 'card p-3 mt-4';
+document.querySelector('main').insertBefore(panel, document.querySelector('.mt-4.card'));
+
+let currentIndex = 0;
+const statesOrder = dfa.steps.map(s=>s.to);
+function step(){
+  if(currentIndex >= statesOrder.length) return;
+  const s = statesOrder[currentIndex];
+  network.selectNodes([s]);
+  showState(s);
+  currentIndex += 1;
+}
+document.getElementById('stepBtn').addEventListener('click', ()=> step());
+document.getElementById('playBtn').addEventListener('click', ()=> {
+  const iv = setInterval(()=> {
+    if(currentIndex >= statesOrder.length){ clearInterval(iv); return; }
+    step();
+  }, 700);
+});
+document.getElementById('resetBtn').addEventListener('click', ()=> { currentIndex=0; network.selectNodes([dfa.start]); showState(dfa.start); });
+
+network.on('afterDrawing', ()=>{ network.selectNodes([dfa.start]); showState(dfa.start); });
+</script>
+{% endblock %}

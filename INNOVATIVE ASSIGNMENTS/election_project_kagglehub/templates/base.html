@@ -1,0 +1,15 @@
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>{% block title %}Election Predictor{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style> body{background:#0f172a;color:#e5e7eb} .card{background:rgba(15,23,42,0.7);padding:1rem;border-radius:.5rem;} </style>
+  </head>
+  <body class="p-6">
+    <main class="max-w-5xl mx-auto">
+      {% block content %}{% endblock %}
+    </main>
+  </body>
+</html>

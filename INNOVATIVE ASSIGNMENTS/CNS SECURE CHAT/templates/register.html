@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Secure Chat — Register</title>
+  <link rel="stylesheet" href="/static/css/styles.css" />
+</head>
+<body>
+  <div class="container center">
+    <div class="card login-card">
+      <h1>Create Secure Account</h1>
+      <p class="muted">Register to join the encrypted chat</p>
+      <form method="POST" action="/register">
+        <label for="username">Username</label>
+        <input id="username" name="username" required />
+
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" required />
+
+        <div class="actions">
+          <button type="submit" class="btn primary">Register</button>
+        </div>
+      </form>
+      <p class="muted">Already registered? <a href="/">Login</a></p>
+    </div>
+  </div>
+</body>
+</html>

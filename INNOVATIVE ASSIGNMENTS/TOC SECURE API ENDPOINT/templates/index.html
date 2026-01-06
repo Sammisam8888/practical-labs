@@ -1,0 +1,37 @@
+
+{% extends 'base.html' %}
+{% block title %}TOC Toolkit{% endblock %}
+{% block content %}
+<div class="grid md:grid-cols-2 gap-6">
+  <div class="card p-6">
+    <h2 class="text-xl font-semibold mb-3">Regex → NFA → DFA</h2>
+    {% if error %}<div class="text-red-400 mb-2">{{ error }}</div>{% endif %}
+    <form method="post" action="/build">
+      <label class="block text-sm text-gray-300">Regular Expression</label>
+      <input name="regex" value="{{ regex or '' }}" class="mt-1 block w-full rounded bg-gray-800 px-3 py-2" placeholder="(a|b)*abb">
+      <div class="pt-4"><button class="px-4 py-2 bg-indigo-600 rounded">Build Automata</button></div>
+    </form>
+    <div class="mt-4 text-sm text-gray-400">
+      Supported operators: concatenation (implicit), <code>|</code> (union), <code>*</code> (Kleene), parentheses.
+    </div>
+  </div>
+  <div class="card p-6">
+    <h2 class="text-xl font-semibold mb-3">Test String</h2>
+    <form method="post" action="/test">
+      <label class="block text-sm text-gray-300">Use regex for automaton</label>
+      <input name="expr" class="mt-1 block w-full rounded bg-gray-800 px-3 py-2" placeholder="(a|b)*abb">
+      <label class="block text-sm text-gray-300 mt-2">String to test</label>
+      <input name="string" class="mt-1 block w-full rounded bg-gray-800 px-3 py-2" placeholder="ababb">
+      <label class="block text-sm text-gray-300 mt-2">Automaton type</label>
+      <select name="automaton" class="mt-1 block w-full rounded bg-gray-800 px-3 py-2">
+        <option value="dfa">DFA (converted)</option>
+        <option value="nfa">NFA</option>
+      </select>
+      <div class="pt-4"><button class="px-4 py-2 bg-green-500 rounded">Test String</button></div>
+    </form>
+    <div class="mt-4 text-sm text-gray-400">
+      The toolkit constructs an NFA using Thompson's construction, converts it to a DFA, and tests strings.
+    </div>
+  </div>
+</div>
+{% endblock %}

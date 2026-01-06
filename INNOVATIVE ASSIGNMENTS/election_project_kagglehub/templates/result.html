@@ -1,0 +1,35 @@
+
+{% extends 'base.html' %}
+{% block title %}Result{% endblock %}
+{% block content %}
+<div class="space-y-6">
+  <div>
+    <h1 class="text-2xl font-bold">Prediction Result</h1>
+    <p class="text-gray-400">Predicted winner based on model's estimated Actual votes.</p>
+  </div>
+  <div class="card">
+    <h3 class="font-semibold">Winner</h3>
+    <div class="mt-2 text-lg">{{ winner.party }} — predicted votes: {{ '%.0f'|format(winner.predicted_actual) }}</div>
+  </div>
+
+  <div class="card">
+    <h3 class="font-semibold">Breakdown</h3>
+    <table class="w-full text-sm"><thead><tr><th>Party</th><th class="text-right">ExitPoll</th><th class="text-right">Predicted Actual</th></tr></thead>
+    <tbody>
+      {% for e in entries %}
+      <tr><td>{{ e.party }}</td><td class="text-right">{{ e.exit }}</td><td class="text-right">{{ '%.0f'|format(e.predicted_actual) }}</td></tr>
+      {% endfor %}
+    </tbody>
+    </table>
+  </div>
+
+  <div class="card text-sm text-gray-400">
+    <h3 class="font-semibold">Model metrics</h3>
+    <div>MSE: {{ metrics.mse }}</div>
+    <div>R²: {{ metrics.r2 }}</div>
+    <div>Winner-accuracy (dataset estimate): {{ metrics.winner_acc }}</div>
+  </div>
+
+  <div><a href="/" class="px-3 py-2 bg-gray-700 rounded">Back</a></div>
+</div>
+{% endblock %}

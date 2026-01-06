@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Secure Chat — RSA Demo + Fingerprints</title>
+  <link rel="stylesheet" href="/static/css/styles.css" />
+  <style>
+    /* small extra styles for the RSA UI */
+    .key-box { background: rgba(255,255,255,0.02); padding:12px; border-radius:8px; margin-top:8px; font-size:12px; white-space:pre-wrap; word-break:break-all; }
+    .controls { display:flex; gap:8px; margin-top:8px; flex-wrap:wrap }
+    .contacts { display:flex; flex-direction:column; gap:8px; margin-top:12px; }
+    .contact { padding:8px;border-radius:8px;background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.02) }
+    .label { color: var(--muted); font-size:13px; margin-top:8px; display:block }
+    .fp { font-family: monospace; font-size:12px; color:var(--muted); margin-top:6px; background: rgba(255,255,255,0.01); padding:8px; border-radius:6px; }
+    .fp.good { color:#86efac; }
+    .fp.bad { color:#fb7185; }
+    .fp.short { font-weight:600; color:var(--accent); }
+    .fp-actions { margin-top:6px; display:flex; gap:8px; flex-wrap:wrap; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="topbar">
+      <h2>🔐 Secure RSA Chat (manual key exchange)</h2>
+      <div class="user">Logged in as: <strong id="me">{{ username }}</strong> | <a href="/logout" class="muted">Logout</a></div>
+    </header>
+
+    <div class="card">
+      <div style="display:flex;gap:18px;flex-wrap:wrap">
+        <div style="flex:1;min-width:300px">
+          <h3>Your Keys</h3>
+          <div>
+            <button id="genKeys" class="btn">Generate RSA Keypair (2048)</button>
+            <button id="showPriv" class="btn">Show Private Key</button>
+            <button id="copyPub" class="btn">Copy Public Key</button>
+          </div>
+
+          <label class="label">Your Public Key (share this with contacts)</label>
+          <div id="pubKey" class="key-box">No public key generated yet.</div>
+          <div class="fp" id="myFingerprint">Fingerprint: <span class="fp.short">—</span></div>
+          <div class="fp-actions">
+            <button id="copyFp" class="btn">Copy Fingerprint</button>
+            <button id="compareFpBtn" class="btn">Compare Remote Fingerprint</button>
+          </div>
+
+          <label class="label">Your Private Key (stored locally only)</label>
+          <div id="privKey" class="key-box">Hidden — click 'Show Private Key' to reveal (stored in browser localStorage)</div>
+        </div>
+
+        <div style="width:360px">
+          <h3>Contacts</h3>
+          <div>
+            <label class="label">Add contact's public key (paste PEM)</label>
+            <textarea id="contactPubInput" rows="4" style="width:100%" placeholder="-----BEGIN PUBLIC KEY-----..."></textarea>
+            <div class="controls">
+              <input id="contactNameInput" placeholder="Contact username (e.g., bob)" style="padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);flex:1" />
+              <button id="addContact" class="btn">Add Contact</button>
+            </div>
+          </div>
+
+          <div class="contacts" id="contactsList">
+            <!-- populated by JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <h3>Encrypted Chat</h3>
+      <main class="chat-area" id="chatArea" role="log" aria-live="polite">
+        <ul id="messages" class="messages"></ul>
+      </main>
+
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <select id="sendTo" style="min-width:160px;padding:8px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06)">
+          <option value="">Select contact...</option>
+        </select>
+        <input id="msgInput" autocomplete="off" placeholder="Type message to selected contact..." style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06)" />
+        <button id="sendBtn" class="btn primary">Encrypt & Send</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fingerprint compare modal (simple prompt-style UI) -->
+  <div id="fpCompareModal" style="display:none;position:fixed;inset:0;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);">
+    <div style="background:var(--card);padding:18px;border-radius:12px;max-width:520px;width:92%;">
+      <h3>Compare remote fingerprint</h3>
+      <p class="muted">Paste the remote short fingerprint (or full) you received from your contact and compare it with your copy of their fingerprint.</p>
+      <input id="fpCompareInput" placeholder="paste fingerprint here" style="width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.06)" />
+      <div style="margin-top:10px;display:flex;gap:8px;justify-content:flex-end">
+        <button id="fpCompareCancel" class="btn">Cancel</button>
+        <button id="fpCompareCheck" class="btn primary">Compare</button>
+      </div>
+      <div id="fpCompareResult" style="margin-top:10px"></div>
+    </div>
+  </div>
+
+  <!-- Dependencies -->
+  <script src="https://cdn.jsdelivr.net/npm/jsencrypt/bin/jsencrypt.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
+  <script>
+    // --- Initialization ---
+    const USERNAME = "{{ username }}";
+    const socket = io({ transports: ['websocket', 'polling'] });
+
+    // LocalStorage keys
+    const LS_PRIV = 'rsa_priv_' + USERNAME;
+    const LS_PUB = 'rsa_pub_' + USERNAME;
+    const LS_CONTACTS = 'rsa_contacts_' + USERNAME; // JSON map: {name: pubkey}
+
+    // Element refs
+    const pubKeyEl = document.getElementById('pubKey');
+    const myFingerprintEl = document.getElementById('myFingerprint');
+    const privKeyEl = document.getElementById('privKey');
+    const genBtn = document.getElementById('genKeys');
+    const showPriv = document.getElementById('showPriv');
+    const copyPub = document.getElementById('copyPub');
+    const copyFpBtn = document.getElementById('copyFp');
+    const compareFpBtn = document.getElementById('compareFpBtn');
+    const contactInput = document.getElementById('contactPubInput');
+    const contactNameInput = document.getElementById('contactNameInput');
+    const addContactBtn = document.getElementById('addContact');
+    const contactsList = document.getElementById('contactsList');
+    const sendTo = document.getElementById('sendTo');
+    const msgInput = document.getElementById('msgInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const messages = document.getElementById('messages');
+
+    const fpModal = document.getElementById('fpCompareModal');
+    const fpCompareInput = document.getElementById('fpCompareInput');
+    const fpCompareCancel = document.getElementById('fpCompareCancel');
+    const fpCompareCheck = document.getElementById('fpCompareCheck');
+    const fpCompareResult = document.getElementById('fpCompareResult');
+
+    // Load stored
+    function loadKeysUI() {
+      const pub = localStorage.getItem(LS_PUB);
+      if (pub) {
+        pubKeyEl.textContent = pub;
+        const fp = fingerprintOfPem(pub);
+        myFingerprintEl.innerHTML = `Fingerprint: <span class="fp.short">${shortFp(fp)}</span><div class="muted" style="margin-top:6px">${formatFp(fp)}</div>`;
+      } else {
+        pubKeyEl.textContent = "No public key generated yet.";
+        myFingerprintEl.innerHTML = `Fingerprint: <span class="fp.short">—</span>`;
+      }
+      privKeyEl.textContent = "Hidden — click 'Show Private Key' to reveal (stored in browser localStorage)";
+      loadContactsUI();
+    }
+
+    function loadContactsUI() {
+      const raw = localStorage.getItem(LS_CONTACTS);
+      let map = raw ? JSON.parse(raw) : {};
+      contactsList.innerHTML = '';
+      sendTo.innerHTML = '<option value="">Select contact...</option>';
+      for (const name of Object.keys(map)) {
+        const pub = map[name];
+        const fp = fingerprintOfPem(pub);
+        const div = document.createElement('div');
+        div.className = 'contact';
+        div.innerHTML = `<strong>${name}</strong>
+          <div style="font-size:12px;margin-top:6px;white-space:pre-wrap">${pub.substring(0,120)}...</div>
+          <div class="fp">FP: <span class="fp.short">${shortFp(fp)}</span> <div style="margin-top:6px">${formatFp(fp)}</div></div>
+          <div style="margin-top:8px">
+            <button class="btn copy-pub" data-name="${name}" data-pub="${encodeURIComponent(pub)}">Copy pub</button>
+            <button class="btn copy-fp" data-fp="${fp}">Copy fp</button>
+            <button class="btn remove-contact" data-remove="${name}">Remove</button>
+          </div>`;
+        contactsList.appendChild(div);
+
+        const opt = document.createElement('option');
+        opt.value = name;
+        opt.textContent = name;
+        sendTo.appendChild(opt);
+      }
+
+      // attach handlers for dynamic buttons
+      contactsList.querySelectorAll('button.copy-pub').forEach(b=>{
+        b.addEventListener('click', (e)=>{
+          const pub = decodeURIComponent(b.getAttribute('data-pub'));
+          navigator.clipboard.writeText(pub).then(()=> alert('Contact public key copied to clipboard'));
+        });
+      });
+      contactsList.querySelectorAll('button.copy-fp').forEach(b=>{
+        b.addEventListener('click', (e)=>{
+          const fp = b.getAttribute('data-fp');
+          navigator.clipboard.writeText(fp).then(()=> alert('Contact fingerprint copied to clipboard'));
+        });
+      });
+      contactsList.querySelectorAll('button.remove-contact').forEach(b=>{
+        b.addEventListener('click', (e)=>{
+          const n = b.getAttribute('data-remove');
+          const raw = localStorage.getItem(LS_CONTACTS);
+          let map = raw ? JSON.parse(raw) : {};
+          delete map[n];
+          localStorage.setItem(LS_CONTACTS, JSON.stringify(map));
+          loadContactsUI();
+        });
+      });
+    }
+
+    loadKeysUI();
+
+    // --- Fingerprint helpers (CryptoJS SHA256) ---
+    function fingerprintOfPem(pem) {
+      // Normalize PEM string: remove header/footer and whitespace, then SHA256 the raw DER bytes (approx).
+      // For demo simplicity we'll hash the whole PEM text (including headers). This is stable and fine for teaching.
+      const wordArray = CryptoJS.enc.Utf8.parse(pem.trim());
+      const hash = CryptoJS.SHA256(wordArray);
+      return hash.toString(CryptoJS.enc.Hex);
+    }
+    function formatFp(fp) {
+      // human-friendly grouped hex: e.g., ab:cd:ef:12...
+      return fp.match(/.{1,2}/g).join(':').toUpperCase();
+    }
+    function shortFp(fp) {
+      return fp.slice(0, 16).toUpperCase();
+    }
+
+    // --- Key generation (client-side) ---
+    genBtn.addEventListener('click', ()=>{
+      genBtn.disabled = true;
+      genBtn.textContent = 'Generating... (may take a few seconds)';
+      setTimeout(()=>{
+        try {
+          const crypt = new JSEncrypt({default_key_size: 2048});
+          const priv = crypt.getPrivateKey();
+          const pub = crypt.getPublicKey();
+          localStorage.setItem(LS_PRIV, priv);
+          localStorage.setItem(LS_PUB, pub);
+          pubKeyEl.textContent = pub;
+          const fp = fingerprintOfPem(pub);
+          myFingerprintEl.innerHTML = `Fingerprint: <span class="fp.short">${shortFp(fp)}</span><div class="muted" style="margin-top:6px">${formatFp(fp)}</div>`;
+          alert('Keypair generated — private key stored in your browser. Copy & share the public key or its fingerprint with contacts.');
+        } catch (e) {
+          alert('Key generation failed: '+e);
+        } finally {
+          genBtn.disabled = false;
+          genBtn.textContent = 'Generate RSA Keypair (2048)';
+        }
+      }, 100);
+    });
+
+    showPriv.addEventListener('click', ()=>{
+      const p = localStorage.getItem(LS_PRIV);
+      if (!p) return alert('No private key found. Generate one first.');
+      if (privKeyEl.textContent.startsWith('Hidden')) {
+        privKeyEl.textContent = p;
+        showPriv.textContent = 'Hide Private Key';
+      } else {
+        privKeyEl.textContent = 'Hidden — click \'Show Private Key\' to reveal (stored in browser localStorage)';
+        showPriv.textContent = 'Show Private Key';
+      }
+    });
+
+    copyPub.addEventListener('click', async ()=>{
+      const p = localStorage.getItem(LS_PUB);
+      if (!p) return alert('No public key. Generate keys first.');
+      await navigator.clipboard.writeText(p);
+      alert('Public key copied — paste to your friend or to their contact form.');
+    });
+
+    copyFpBtn.addEventListener('click', async ()=>{
+      const p = localStorage.getItem(LS_PUB);
+      if (!p) return alert('No public key. Generate keys first.');
+      const fp = fingerprintOfPem(p);
+      await navigator.clipboard.writeText(fp);
+      alert('Your full fingerprint copied to clipboard (hex). You can share the short version: ' + shortFp(fp));
+    });
+
+    compareFpBtn.addEventListener('click', ()=>{
+      fpCompareInput.value = '';
+      fpCompareResult.innerHTML = '';
+      fpModal.style.display = 'flex';
+    });
+
+    fpCompareCancel.addEventListener('click', ()=>{
+      fpModal.style.display = 'none';
+    });
+
+    fpCompareCheck.addEventListener('click', ()=>{
+      const remote = (fpCompareInput.value||'').trim().replace(/[^a-fA-F0-9]/g,'').toLowerCase();
+      if (!remote) return alert('Paste the remote fingerprint (hex) or its short 8-byte prefix.');
+      const pub = localStorage.getItem(LS_PUB);
+      if (!pub) return alert('No local public key; generate keys first.');
+      const mine = fingerprintOfPem(pub);
+      const mineShort = mine.slice(0, remote.length);
+      const ok = mine.slice(0, remote.length) === remote;
+      fpCompareResult.innerHTML = ok ? `<div class="fp good">✔ Match — fingerprints are identical (length ${remote.length} hex chars)</div>` : `<div class="fp bad">✖ MISMATCH — fingerprints differ</div><div style="margin-top:6px">Your short FP: <span class="fp.short">${shortFp(mine)}</span></div>`;
+    });
+
+    // Add contact
+    addContactBtn.addEventListener('click', ()=>{
+      const pub = contactInput.value.trim();
+      const name = contactNameInput.value.trim();
+      if (!pub || !name) return alert('Enter both contact name and public key PEM.');
+      let map = localStorage.getItem(LS_CONTACTS);
+      map = map ? JSON.parse(map) : {};
+      map[name] = pub;
+      localStorage.setItem(LS_CONTACTS, JSON.stringify(map));
+      contactInput.value = '';
+      contactNameInput.value = '';
+      loadContactsUI();
+    });
+
+    // --- Socket / room setup ---
+    socket.on('connect', ()=>{
+      addSysMsg('Connected to server over TLS/websocket (if TLS configured).');
+      socket.emit('join_room', {username: USERNAME});
+    });
+
+    socket.on('status', (d)=> addSysMsg(d.msg));
+
+    // Received RSA payload
+    socket.on('rsa_message', (data)=>{
+      const sender = data.sender;
+      const recipient = data.recipient;
+      const ciphertext = data.ciphertext;
+      const signature = data.signature;
+      const sender_pub = data.sender_pub;
+
+      const priv = localStorage.getItem(LS_PRIV);
+      if (!priv) {
+        addSysMsg(`Encrypted message from ${sender} — you have no private key to decrypt. Ask sender to share your public key.`);
+        addEncryptedMessage(sender, ciphertext, null, sender_pub);
+        return;
+      }
+
+      try {
+        const dec = new JSEncrypt();
+        dec.setPrivateKey(priv);
+        const plain = dec.decrypt(ciphertext);
+        if (plain === false || plain === null) {
+          addSysMsg(`Could not decrypt message from ${sender}.`);
+          addEncryptedMessage(sender, ciphertext, null, sender_pub);
+          return;
+        }
+        // verify signature if possible
+        let verified = null;
+        if (signature && sender_pub) {
+          const verifier = new JSEncrypt();
+          verifier.setPublicKey(sender_pub);
+          try {
+            verified = verifier.verify(plain, signature, CryptoJS.SHA256);
+          } catch (e) {
+            verified = false;
+          }
+        }
+        addDecryptedMessage(sender, plain, verified);
+      } catch (e) {
+        addSysMsg(`Error during decryption: ${e}`);
+        addEncryptedMessage(sender, ciphertext, null, sender_pub);
+      }
+    });
+
+    function addSysMsg(msg) {
+      const li = document.createElement('li');
+      li.innerHTML = `<em>${escapeHtml(msg)}</em>`;
+      messages.appendChild(li);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function addEncryptedMessage(sender, ciphertext, sig, sender_pub) {
+      const li = document.createElement('li');
+      li.innerHTML = `<div class="bubble"><strong>${escapeHtml(sender)}</strong><div class="encrypted">🔐 Ciphertext:</div><div style="font-family:monospace;word-break:break-all">${escapeHtml(ciphertext)}</div></div>`;
+      messages.appendChild(li);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function addDecryptedMessage(sender, plain, verified) {
+      const li = document.createElement('li');
+      const verText = verified === null ? '<span class="muted">no signature</span>'
+                      : (verified ? '<span class="fp good">✔ signature OK</span>' : '<span class="fp bad">✖ signature FAIL</span>');
+      li.innerHTML = `<div class="bubble"><strong>${escapeHtml(sender)}</strong><div class="decrypted">💬 ${escapeHtml(plain)}</div><div style="margin-top:6px">${verText}</div></div>`;
+      messages.appendChild(li);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    // Send encrypted message to selected contact
+    sendBtn.addEventListener('click', async ()=>{
+      const to = sendTo.value;
+      const txt = msgInput.value.trim();
+      if (!to) return alert('Select a contact to send to.');
+      if (!txt) return;
+
+      const contactsRaw = localStorage.getItem(LS_CONTACTS);
+      const contacts = contactsRaw ? JSON.parse(contactsRaw) : {};
+      const recPub = contacts[to];
+      if (!recPub) return alert('Recipient public key not found in contacts. Paste their public key into Add Contact.');
+
+      const enc = new JSEncrypt();
+      enc.setPublicKey(recPub);
+      const ciphertext = enc.encrypt(txt);
+      if (!ciphertext) return alert('Encryption failed (ciphertext null). Try shorter message or regenerate keys.');
+
+      const myPriv = localStorage.getItem(LS_PRIV);
+      const myPub = localStorage.getItem(LS_PUB);
+      let signature = null;
+      if (myPriv) {
+        try {
+          const signer = new JSEncrypt();
+          signer.setPrivateKey(myPriv);
+          signature = signer.sign(txt, CryptoJS.SHA256, "sha256");
+        } catch (e) {
+          console.warn('Signature failed', e);
+          signature = null;
+        }
+      }
+
+      socket.emit('rsa_message', {
+        sender: USERNAME,
+        recipient: to,
+        ciphertext: ciphertext,
+        signature: signature,
+        sender_pub: myPub
+      });
+
+      msgInput.value = '';
+      addSysMsg(`Encrypted message sent to ${to} (fingerprint shown in contacts).`);
+    });
+
+    // Escape helper
+    function escapeHtml(s) {
+      if (!s) return '';
+      return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    // join private room on connect
+    socket.on('connect', ()=> {
+      socket.emit('join_room', {username: USERNAME});
+    });
+
+  </script>
+</body>
+</html>

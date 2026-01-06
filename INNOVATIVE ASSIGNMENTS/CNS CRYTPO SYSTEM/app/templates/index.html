@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+{% block title %}Run Simulation{% endblock %}
+{% block content %}
+<style>
+  #throughputChart {
+    max-height: 320px;
+    height: 320px !important;
+  }
+  .chart-container {
+    position: relative;
+    height: 320px;
+    overflow: hidden;
+  }
+  .info-box {
+    font-size: 0.9rem;
+    color: #9ca3af;
+    background: rgba(31,41,55,0.6);
+    border-left: 3px solid #6366f1;
+    padding: 10px 14px;
+    border-radius: 0.5rem;
+  }
+</style>
+
+<div class="space-y-8">
+  <!-- PAGE HEADER -->
+  <div class="text-center">
+    <h1 class="text-3xl font-bold mb-2">Cryptocurrency Network Simulation</h1>
+    <p class="text-gray-400 max-w-3xl mx-auto">
+      This tool simulates how a blockchain network behaves under different conditions —
+      such as number of nodes, honesty ratio, and transaction rate. 
+      The resulting graph shows how efficiently the network processes transactions over time (throughput).
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- INPUT PANEL -->
+    <div class="card p-6 rounded-lg shadow">
+      <h2 class="text-xl font-semibold mb-4">Quick Simulation Setup</h2>
+      <p class="info-box mb-4">
+        Configure the parameters below to observe how they affect network performance. 
+        More honest nodes improve security, while higher transaction rates increase network load.
+      </p>
+
+      <form id="simForm" class="space-y-4">
+        <div>
+          <label class="block text-sm text-gray-300 mb-1">Simulation Name</label>
+          <input name="name" value="My Simulation" class="block w-full rounded bg-gray-800 border border-gray-700 px-3 py-2">
+          <p class="text-xs text-gray-500 mt-1">Label for this run — appears in results and dashboard.</p>
+        </div>
+
+        <div>
+          <label class="block text-sm text-gray-300 mb-1">Number of Nodes</label>
+          <input type="number" name="num_nodes" value="50" class="block w-full rounded bg-gray-800 border border-gray-700 px-3 py-2">
+          <p class="text-xs text-gray-500 mt-1">Represents total network participants (validators/miners).</p>
+        </div>
+
+        <div>
+          <label class="block text-sm text-gray-300 mb-1">Honest Node Ratio (0–1)</label>
+          <input type="number" step="0.01" name="honest_ratio" value="0.8" class="block w-full rounded bg-gray-800 border border-gray-700 px-3 py-2">
+          <p class="text-xs text-gray-500 mt-1">Defines what fraction of nodes follow protocol honestly.</p>
+        </div>
+
+        <div>
+          <label class="block text-sm text-gray-300 mb-1">Transaction Rate per Node</label>
+          <input type="number" step="0.1" name="tx_rate" value="5.0" class="block w-full rounded bg-gray-800 border border-gray-700 px-3 py-2">
+          <p class="text-xs text-gray-500 mt-1">Average number of transactions each node attempts per unit time.</p>
+        </div>
+
+        <div class="pt-4">
+          {% if current_user.is_authenticated %}
+          <button type="button" id="runSim" class="px-4 py-2 rounded bg-indigo-600 hover:bg-indigo-500 w-full font-medium">Run Simulation</button>
+          {% else %}
+          <a class="px-4 py-2 rounded bg-indigo-600 hover:bg-indigo-500 inline-block w-full text-center" href="{{ url_for('login') }}">Login to run</a>
+          {% endif %}
+        </div>
+      </form>
+    </div>
+
+    <!-- OUTPUT PANEL -->
+    <div class="card p-6 rounded-lg shadow col-span-2">
+      <h2 class="text-xl font-semibold mb-4">Simulation Results</h2>
+      <p class="info-box mb-4">
+        Once the simulation completes, you’ll see key metrics like <b>latency</b>, <b>alive nodes</b>,
+        and <b>double-spend risk</b> here. The graph visualizes throughput changes over time.
+      </p>
+
+      <div id="summary" class="text-gray-300 mb-4 italic">No simulation yet — fill inputs and click “Run Simulation”.</div>
+      <div class="chart-container">
+        <canvas id="throughputChart"></canvas>
+      </div>
+
+      <div id="explanation" class="mt-4 text-gray-400 text-sm hidden">
+        <hr class="border-gray-700 my-4">
+        <h3 class="text-lg font-semibold mb-2 text-gray-200">How to Interpret This Graph</h3>
+        <ul class="list-disc ml-6 space-y-1">
+          <li><b>X-axis (Time):</b> Each tick represents one simulation time step.</li>
+          <li><b>Y-axis (Throughput):</b> Number of successful transactions per step — higher is better.</li>
+          <li><b>Stable high line:</b> Network is efficient and stable.</li>
+          <li><b>Fluctuating or dropping line:</b> Indicates congestion, attacks, or node failures.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function updateChart(labels, data){
+  const ctx = document.getElementById('throughputChart').getContext('2d');
+  if(window.throughputChart){ window.throughputChart.destroy(); }
+  window.throughputChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Network Throughput',
+        data,
+        borderColor: '#6366f1',
+        backgroundColor: 'rgba(99,102,241,0.2)',
+        tension: 0.3,
+        fill: true,
+        pointRadius: 0
+      }]
+    },
+    options: {
+      maintainAspectRatio: false,
+      responsive: true,
+      scales: {
+        x: { title: { display: true, text: 'Time (simulation steps)', color: '#ccc' }, ticks: { color: '#999' } },
+        y: { title: { display: true, text: 'Throughput (transactions per step)', color: '#ccc' }, ticks: { color: '#999' } }
+      },
+      plugins: { legend: { labels: { color: '#ccc' } } }
+    }
+  });
+}
+
+window.updateChart = updateChart;
+
+window.addEventListener('DOMContentLoaded', ()=> {
+  const run = document.getElementById('runSim');
+  if(run){
+    run.addEventListener('click', async ()=> {
+      const form = document.getElementById('simForm');
+      const fd = new FormData(form);
+      const payload = {
+        name: fd.get('name'),
+        params: {
+          num_nodes: fd.get('num_nodes'),
+          honest_ratio: fd.get('honest_ratio'),
+          tx_rate: fd.get('tx_rate')
+        }
+      };
+
+      const summary = document.getElementById('summary');
+      summary.innerText = 'Running simulation...';
+
+      const res = await fetch('/simulate', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(payload)
+      });
+
+      const j = await res.json();
+      const r = j.summary;
+      summary.innerHTML = `
+        <div class="grid grid-cols-2 gap-3 text-sm">
+          <div><b>Total Nodes:</b> ${r.nodes}</div>
+          <div><b>Alive Nodes:</b> ${r.alive}</div>
+          <div><b>Avg Latency:</b> ${r.avg_latency_ms} ms</div>
+          <div><b>Double Spend Risk:</b> ${r.double_spend_risk_pct}%</div>
+        </div>
+      `;
+
+      document.getElementById('explanation').classList.remove('hidden');
+      const timeline = j.result.timeline || [];
+      const labels = timeline.map(x=>x.t);
+      const data = timeline.map(x=>x.throughput);
+      window.updateChart(labels, data);
+    });
+  }
+});
+</script>
+{% endblock %}

@@ -29,16 +29,16 @@ void bestFit(int blockSize[], int m, int processSize[], int n) {
     for (int i = 0; i < n; i++) allocation[i] = -1;
 
     for (int i = 0; i < n; i++) {
-        int bestIdx = -1;
+        int best = -1;
         for (int j = 0; j < m; j++) {
             if (blockSize[j] >= processSize[i]) {
-                if (bestIdx == -1 || blockSize[j] < blockSize[bestIdx])
-                    bestIdx = j;
+                if (best == -1 || blockSize[j] < blockSize[best])
+                    best = j;
             }
         }
-        if (bestIdx != -1) {
-            allocation[i] = bestIdx;
-            blockSize[bestIdx] -= processSize[i];
+        if (best != -1) {
+            allocation[i] = best;
+            blockSize[best] -= processSize[i];
         }
     }
 
@@ -57,16 +57,16 @@ void worstFit(int blockSize[], int m, int processSize[], int n) {
     for (int i = 0; i < n; i++) allocation[i] = -1;
 
     for (int i = 0; i < n; i++) {
-        int worstIdx = -1;
+        int worst = -1;
         for (int j = 0; j < m; j++) {
             if (blockSize[j] >= processSize[i]) {
-                if (worstIdx == -1 || blockSize[j] > blockSize[worstIdx])
-                    worstIdx = j;
+                if (worst == -1 || blockSize[j] > blockSize[worst])
+                    worst = j;
             }
         }
-        if (worstIdx != -1) {
-            allocation[i] = worstIdx;
-            blockSize[worstIdx] -= processSize[i];
+        if (worst != -1) {
+            allocation[i] = worst;
+            blockSize[worst] -= processSize[i];
         }
     }
 

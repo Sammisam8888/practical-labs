@@ -1,0 +1,3 @@
+(a|b)*abb
+(a|b)a(a|b)
+abb|a*

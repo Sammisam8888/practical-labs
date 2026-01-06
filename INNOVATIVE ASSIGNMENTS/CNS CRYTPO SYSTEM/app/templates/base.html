@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Crypto Transaction - {% block title %}{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      .card { background-color: rgba(17,24,39,0.6); border: 1px solid rgba(255,255,255,0.04); }
+      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace; }
+      .logo-glow {
+        background: radial-gradient(circle at 30% 30%, #6366f1 0%, #8b5cf6 70%);
+        box-shadow: 0 0 20px rgba(99,102,241,0.5);
+      }
+      .nav-link:hover { background-color: rgba(255,255,255,0.08); }
+    </style>
+  </head>
+  <body class="bg-gray-900 text-gray-100 min-h-screen">
+    <nav class="p-4 border-b border-gray-800 backdrop-blur-md bg-gray-900/80">
+      <div class="max-w-6xl mx-auto flex items-center justify-between">
+        <a class="flex items-center gap-3" href="{{ url_for('index') }}">
+          <div class="w-10 h-10 rounded-2xl logo-glow flex items-center justify-center font-bold text-lg text-white shadow-inner">₿</div>
+          <div class="text-lg font-semibold tracking-wide">Cryptocurrency Network Security</div>
+        </a>
+        <div class="flex items-center gap-3">
+          <a class="px-3 py-2 rounded nav-link" href="{{ url_for('dashboard') }}">Dashboard</a>
+          <a class="px-3 py-2 rounded nav-link hover:bg-indigo-500 text-white" href="{{ url_for('index') }}">
+            Run Simulation
+          </a>
+          {% if current_user.is_authenticated %}
+            <span class="text-sm text-gray-400 mr-2">Hi, {{ current_user.name }}</span>
+            <a class="px-3 py-2 rounded nav-link" href="{{ url_for('logout') }}">Logout</a>
+          {% else %}
+            <a class="px-3 py-2 rounded nav-link" href="{{ url_for('login') }}">Login</a>
+            <a class="px-3 py-2 rounded nav-link" href="{{ url_for('register') }}">Register</a>
+          {% endif %}
+        </div>
+      </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto p-6">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="space-y-2 mb-4">
+            {% for cat,msg in messages %}
+              <div class="p-2 rounded {{ 'bg-green-700' if cat=='success' else ('bg-red-700' if cat=='error' else 'bg-gray-800') }}">{{ msg }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="text-sm text-gray-400 p-4 border-t border-gray-800 text-center">
+      Built for CNS Assignment • Flask Simulation Dashboard
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  </body>
+</html>

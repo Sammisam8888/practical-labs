@@ -15,7 +15,7 @@ pp = pprint.PrettyPrinter(width=120)
 # optional drawing libs
 try:
     import networkx as nx
-    import matplotlib.pyplot as plt
+    import matplotlib.pyplot as plt 
     DRAW = True
 except Exception:
     DRAW = False
