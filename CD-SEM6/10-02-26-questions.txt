@@ -1,0 +1,5 @@
+write lex specification file to 
+1 - count digits and alphabets, spaces,lines
+2 - count no of words
+3 - check valid identifier
+4 - find out keywords
