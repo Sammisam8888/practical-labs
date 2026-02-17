@@ -1,0 +1,4 @@
+i - write a lex file to test the validity  of a simple expression involving operators (+ * - /)
+ii - write a lex file to recognise the nested if control statement and display the number of levels of nesting
+iii - write a lex file count vowels and consonants
+iv - write a lex file to recognise valid integer and float
