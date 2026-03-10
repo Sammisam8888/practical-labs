@@ -2,17 +2,17 @@
     #include <stdio.h>
     int valid = 1;
     int top = -1;
-    int operand_count = 0;
-    int operator_count = 0;
-    int p_balance = 0;
+    int operand = 0;
+    int operator = 0;
+    int p = 0;
 %}
 
 %%
 
-"(" { p_balance++; }
-")" { p_balance--; }
-[a-zA-Z0-9]+ { operand_count++; }
-"+"|"-"|"*"|"/" { operator_count++; }
+"(" { p++; }
+")" { p--; }
+[a-zA-Z0-9]+ { operand++; }
+"+"|"-"|"*"|"/" { operator++; }
 \n { return 0; }
 . { valid = 0; }
 
@@ -27,14 +27,13 @@ int main(int argc, char *argv[]) {
     // 2. Operands should be exactly Operator + 1 (for binary operators)
     // 3. No invalid characters found
     
-    if (valid && p_balance == 0 && operand_count == operator_count + 1 && operator_count > 0) {
+    if (valid && p == 0 && operand == operator + 1 && operator > 0) {
         printf("Valid Expression\n");
-    } else if (valid && p_balance == 0 && operand_count == 1 && operator_count == 0) {
+    } else if (valid && p == 0 && operand == 1 && operator == 0) {
         printf("Valid Expression (Single Operand)\n");
     } else {
+
         printf("Invalid Expression\n");
-        // Debug info if needed:
-        // printf("Debug: Ops=%d, Oprnds=%d, P_Bal=%d\n", operator_count, operand_count, p_balance);
     }
     return 0;
 }

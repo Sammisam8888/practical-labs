@@ -1,0 +1,20 @@
+how to compile and run the file yac file
+
+yacc -d filename.y
+
+after compiling it will generate 2 files :
+
+y.tab.h & y.tab.c
+
+then compile the y.tab.c file using gcc
+(to individually compile the y.tab.c file)
+gcc y.tab.c -o output
+gcc lex.yy.c -lfl -o output
+
+to run output from both lex & yacc and generate a single output parser :
+
+gcc y.tab.c lex.yy.c -lfl -o parser 
+
+then run the output file
+
+./output inputfile
