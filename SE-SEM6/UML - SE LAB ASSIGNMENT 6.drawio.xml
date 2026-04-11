@@ -1,0 +1,55 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Use Case Structured">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10">
+      <root>
+        <mxCell id="0"/><mxCell id="1" parent="0"/>
+
+        <!-- Title -->
+        <mxCell value="<b>Use Case Diagram</b>" style="text;html=1;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="350" y="20" width="200" height="30" as="geometry"/>
+        </mxCell>
+
+        <!-- Actor -->
+        <mxCell value="Manager" style="shape=umlActor;" vertex="1" parent="1">
+          <mxGeometry x="80" y="150" width="40" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell value="Administrator" style="shape=umlActor;" vertex="1" parent="1">
+          <mxGeometry x="750" y="150" width="40" height="80" as="geometry"/>
+        </mxCell>
+
+        <!-- System Boundary -->
+        <mxCell value="AI Digital Employee System" style="rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="200" y="100" width="500" height="300" as="geometry"/>
+        </mxCell>
+
+        <!-- Use Cases -->
+        <mxCell value="Provide Instruction" style="ellipse;" vertex="1" parent="1">
+          <mxGeometry x="260" y="140" width="160" height="50"/>
+        </mxCell>
+
+        <mxCell value="Generate Tasks" style="ellipse;" vertex="1" parent="1">
+          <mxGeometry x="460" y="140" width="160" height="50"/>
+        </mxCell>
+
+        <mxCell value="Execute Tasks" style="ellipse;" vertex="1" parent="1">
+          <mxGeometry x="360" y="230" width="160" height="50"/>
+        </mxCell>
+
+        <mxCell value="View Reports" style="ellipse;" vertex="1" parent="1">
+          <mxGeometry x="260" y="320" width="160" height="50"/>
+        </mxCell>
+
+        <mxCell value="Manage System" style="ellipse;" vertex="1" parent="1">
+          <mxGeometry x="460" y="320" width="160" height="50"/>
+        </mxCell>
+
+        <!-- Connections -->
+        <mxCell edge="1" source="2" target="5" parent="1"><mxGeometry relative="1"/></mxCell>
+        <mxCell edge="1" source="2" target="8" parent="1"><mxGeometry relative="1"/></mxCell>
+        <mxCell edge="1" source="3" target="9" parent="1"><mxGeometry relative="1"/></mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
