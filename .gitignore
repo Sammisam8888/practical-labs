@@ -7,3 +7,5 @@ venv
 *.pdsbak
 __pycache__
 *.pyc
+*.pptx
+*.docx
